@@ -648,12 +648,37 @@ async function initNotif(){
   else toast(x.error||'Қате шықты','err');
  };
 }
+/* ---------- Қолданушылар тізімі: әзірлеуші барлығын, әкімші өз ЖОО студенттерін көреді ---------- */
+let usersAll=[];
+const usersPanel=()=>{
+ if(!me||(me.role!=='admin'&&me.role!=='dev'))return '';
+ return `<section class="bg-white rounded-2xl p-5 border border-slate-200 space-y-3">
+  <div class="flex flex-wrap items-center justify-between gap-2"><div><h3 class="font-extrabold">👥 ${me.role==='dev'?'Қолданушылар':'Студенттер'} <span id="us-n" class="text-slate-400 font-bold text-sm"></span></h3><p class="text-xs text-slate-500 mt-1">Кім тіркелген және қашан кірген. «Белсенді» деп соңғы 7 күнде кірген қолданушы белгіленеді.</p></div><input id="us-q" placeholder="Іздеу: аты, email, бөлме..." class="${F} max-w-xs"></div>
+  <div class="overflow-x-auto"><table class="w-full text-xs"><thead class="text-slate-500"><tr><th class="text-left py-2 pr-3">Аты-жөні</th><th class="text-left pr-3">Email</th><th class="text-left pr-3">ЖОО</th><th class="text-left pr-3">Бөлме</th><th class="text-left pr-3">Рөл</th><th class="text-left pr-3">Тіркелген</th><th class="text-left pr-3">Соңғы кіру</th><th class="text-left">Белсенді</th></tr></thead><tbody id="us-b" class="divide-y divide-slate-100"><tr><td colspan="8" class="py-3 text-slate-500">Жүктелуде…</td></tr></tbody></table></div>
+ </section>`};
+const usDt=s=>{if(!s)return '—';const d=new Date(s.replace(' ','T')+'Z');return isNaN(d)?'—':d.toLocaleString('kk-KZ',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'})};
+function usersDraw(){
+ const b=$('#us-b');if(!b)return;
+ const q=($('#us-q')?$('#us-q').value:'').trim().toLowerCase();
+ let list=usersAll.filter(x=>me.role!=='dev'||dflt==='all'||x.uni===dflt);
+ if(q)list=list.filter(x=>[x.name,x.email,x.room,x.uni].some(v=>String(v||'').toLowerCase().includes(q)));
+ const n=$('#us-n');if(n)n.textContent='('+list.length+')';
+ const RL={student:'Студент',admin:'Әкімші',dev:'Әзірлеуші'};
+ b.innerHTML=list.map(x=>`<tr><td class="py-2 pr-3 font-bold">${esc(x.name)}</td><td class="pr-3">${esc(x.email)}</td><td class="pr-3">${esc(((typeof DORMS!=='undefined'&&DORMS[x.uni])?DORMS[x.uni].n.split(' — ')[0]:x.uni))}</td><td class="pr-3">${esc(x.room||'—')}</td><td class="pr-3">${RL[x.role]||esc(x.role)}</td><td class="pr-3 text-slate-500">${usDt(x.reg)}</td><td class="pr-3 text-slate-500">${usDt(x.last)}</td><td>${x.active?'<span class="text-emerald-600 font-bold">● иә</span>':'<span class="text-slate-400">—</span>'}</td></tr>`).join('')||'<tr><td colspan="8" class="py-3 text-slate-500">Қолданушы жоқ</td></tr>';
+}
+async function initUsers(){
+ const r=await nsReq('/auth/users',{});
+ if(!r.ok){const b=$('#us-b');if(b)b.innerHTML='<tr><td colspan="8" class="py-3 text-red-600">'+esc(r.error||'Қате шықты')+'</td></tr>';return}
+ usersAll=r.users||[];usersDraw();
+ const i=$('#us-q');if(i)i.oninput=usersDraw;
+}
 const adminView=()=>{
  const base=V().filter(t=>dflt==='all'||t.dorm===dflt),list=base.filter(t=>flt==='all'||t.st===flt),c=s=>base.filter(t=>t.st===s).length;
  return `
 <main class="max-w-[1500px] mx-auto px-4 py-6 space-y-6">
  ${me.role==='admin'?`<div class="bg-white rounded-2xl p-4 border border-slate-200 flex flex-wrap items-center justify-between gap-3"><div class="text-xs"><div class="font-bold text-slate-700">🔑 Университетіңіздің студент коды</div><div class="text-slate-500 mt-0.5">Кодты тек өз студенттеріңізге беріңіз: код пен ЖОО поштасы болмаса, тіркелу мүмкін емес.</div></div><span class="px-4 py-2 rounded-xl bg-slate-900 text-white font-extrabold tracking-wider select-all" id="stu-code">···</span></div>`:''}
  ${notifPanel()}
+ ${usersPanel()}
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">${kpi('Барлық өтінім',base.length,'text-slate-900')}${kpi('🔴 Ашық',(c('open')+c('received')),'text-red-600')}${kpi('🛠️ Жөнделуде',c('in_progress'),'text-amber-600')}${kpi('🟢 Жөнделді',c('resolved'),'text-emerald-600')}</div>
  <div class="bg-white rounded-2xl p-4 border border-slate-200 flex flex-wrap items-center justify-between gap-3">
   <select id="fd" class="${F} !w-auto !mt-0">${[...(me.role==='dev'?['all']:[]),...VD()].map(k=>`<option value="${k}"${k===dflt?' selected':''}>${k==='all'?'Барлық ЖОО':DORMS[k].n}</option>`).join('')}</select>
@@ -845,6 +870,7 @@ const openView=()=>`<main class="max-w-[1100px] mx-auto px-4 py-6 space-y-6"><se
 function render(){const a=$('#ai');if(a)a.classList.toggle('hidden',!me);if(map){try{map.remove?map.remove():map.destroy()}catch(e){}map=null}meMk=null;if(pmap){try{pmap.remove()}catch(e){}}pmap=pMk=pCirc=uMk=null;if(me&&me.role==='admin')dflt=me.dorm;if(me&&!can(page))page=HOME[me.role];$('#app').innerHTML=me?shell(({student:studentView,dorm:dormView,open:openView,map:mapView,admin:adminView,about:aboutView,dev:devTools,help:helpView})[page]()):(landing?landingView():authView());bind();dormBind()}
 function bind(){
  if(me&&$('#ns-save'))initNotif();
+ if(me&&$('#us-b'))initUsers();
  if(me&&$('#stu-code'))api('/auth/code').then(r=>{const e=$('#stu-code');if(e)e.textContent=r.ok&&r.code?r.code:'—'});
  if(!me){
   if(landing){$$('[data-go]').forEach(b=>b.onclick=()=>{mode=b.dataset.go;preDorm=b.dataset.d||'';landing=false;render();scrollTo(0,0)});return}
