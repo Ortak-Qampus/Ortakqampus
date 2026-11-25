@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1c1450">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64' fill='none'%3E%3Cdefs%3E%3ClinearGradient id='lg1a' x1='6' y1='2' x2='58' y2='62' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%232a2f7a'/%3E%3Cstop offset='1' stop-color='%23090d24'/%3E%3C/linearGradient%3E%3CradialGradient id='lg1b' cx='0' cy='0' r='1' gradientUnits='userSpaceOnUse' gradientTransform='translate(18 10) rotate(45) scale(46)'%3E%3Cstop stop-color='%23fff' stop-opacity='.22'/%3E%3Cstop offset='1' stop-color='%23fff' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='18' fill='url(%23lg1a)'/%3E%3Crect width='64' height='64' rx='18' fill='url(%23lg1b)'/%3E%3Crect x='.75' y='.75' width='62.5' height='62.5' rx='17.25' stroke='%23fff' stroke-opacity='.14' stroke-width='1.5'/%3E%3Cpath d='M35.82 15.44A17 17 0 0 1 48.56 28.18' stroke='%23ff4d6d' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M48.56 35.82A17 17 0 0 1 35.82 48.56' stroke='%2338bdf8' stroke-width='4.5' stroke-linecap='round'/%3E%3Cpath d='M28.18 48.56A17 17 0 0 1 15.44 35.82' stroke='%23fbbf24' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M15.44 28.18A17 17 0 0 1 28.18 15.44' stroke='%2334d399' stroke-width='7.5' stroke-linecap='round'/%3E%3Cpath d='M32 22.5c-4.6 0-7.7 3.3-7.7 7.4 0 5 5.4 9.6 7.7 11.8 2.3-2.2 7.7-6.8 7.7-11.8 0-4.1-3.1-7.4-7.7-7.4z' fill='%23fff'/%3E%3Ccircle cx='32' cy='30' r='3' fill='%230d1130'/%3E%3C/svg%3E">
+<title>Ortaq Campus — Алматы ЖОО жатақханалары</title>
+<script>
+/* Қате болса, ақ бет орнына қызыл жолақта көрсетеді */
+(function(){function show(m){try{var d=document.getElementById('errbar');if(!d){d=document.createElement('div');d.id='errbar';(document.body||document.documentElement).appendChild(d)}d.style.cssText='position:fixed;left:0;right:0;top:0;z-index:99999;background:#fee2e2;color:#991b1b;font:12px monospace;padding:8px;white-space:pre-wrap';d.textContent=m}catch(_){}}
+window.addEventListener('error',function(e){if(e.message)show('JS error: '+e.message+' ['+(e.lineno||'')+':'+(e.colno||'')+']')});
+window.addEventListener('unhandledrejection',function(e){show('Promise error: '+((e.reason&&e.reason.message)||e.reason))});})();
+</script>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<style>
+body{font-family:Inter,system-ui,sans-serif;background:linear-gradient(160deg,#dbeafe 0%,#f8fafc 40%,#e0e7ff 100%) fixed;min-height:100vh}
+.pin{width:30px;height:30px;border-radius:50%;border:3px solid #fff;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.35)}
+.pin.r{background:#dc2626;animation:pulse 1.6s infinite}.pin.o{background:#0ea5e9}.pin.a{background:#f59e0b}.pin.g{background:#059669}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(239,68,68,.65)}100%{box-shadow:0 0 0 18px rgba(239,68,68,0)}}
+@media(prefers-reduced-motion:reduce){.pin.r{animation:none}}
+.leaflet-popup-content-wrapper{border-radius:1rem}
+.leaflet-container{isolation:isolate}
+html{scroll-behavior:smooth}::selection{background:#bfdbfe}
+button,a,select,input,textarea{transition:background-color .15s,box-shadow .15s,border-color .15s,transform .1s}
+button:active{transform:scale(.97)}
+.bg-white.rounded-3xl{box-shadow:0 1px 2px rgba(15,23,42,.04),0 10px 28px -14px rgba(15,23,42,.14)}
+.fade{animation:fade .35s ease}@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.fade{animation:none}html{scroll-behavior:auto}}
+.ai-glow{position:relative}.ai-glow::after{content:'';position:absolute;inset:-5px;border-radius:9999px;border:2px solid rgba(99,102,241,.5);animation:aiP 2.6s ease-out infinite;pointer-events:none}
+@keyframes aiP{0%{transform:scale(.92);opacity:.9}100%{transform:scale(1.25);opacity:0}}
+@media(prefers-reduced-motion:reduce){.ai-glow::after{animation:none}}
+.sb::-webkit-scrollbar{width:6px}.sb::-webkit-scrollbar-thumb{background:#334155;border-radius:9px}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style id="theme">
+:root{--v1:#6d5df6;--v2:#9b5cf6;--ink:#1c1450}
+body{background:radial-gradient(900px 520px at 6% -6%,rgba(155,92,246,.24),transparent 60%),radial-gradient(800px 480px at 96% 4%,rgba(20,184,166,.20),transparent 60%),radial-gradient(900px 600px at 88% 100%,rgba(249,115,22,.14),transparent 60%),radial-gradient(700px 500px at 0% 100%,rgba(99,102,241,.18),transparent 60%),#f6f4ff;background-attachment:fixed;color:#1e1b3a;-webkit-font-smoothing:antialiased}
+h1,h2,h3{letter-spacing:-.02em}
+::selection{background:#ddd6fe}
+.ic{display:inline-block;width:1.15em;height:1.15em;vertical-align:-.2em;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.ics{display:inline-flex;align-items:center;justify-content:center}
+.dot{display:inline-block;width:.62em;height:.62em;border-radius:99px;box-shadow:0 0 0 3px rgba(0,0,0,.06)}
+body .bg-blue-600,body .bg-blue-700,body .hover\:bg-blue-700:hover,body .hover\:bg-blue-500:hover{background-image:linear-gradient(135deg,#6d5df6 0%,#9b5cf6 100%);background-color:#6d5df6;color:#fff;box-shadow:0 10px 22px -10px rgba(109,93,246,.75)}
+body .bg-blue-600:hover,body .bg-blue-700:hover{filter:brightness(1.07)}
+body .bg-emerald-600{background-image:linear-gradient(135deg,#10b981,#14b8a6);box-shadow:0 10px 22px -10px rgba(16,185,129,.7)}
+body .bg-amber-400{background-image:linear-gradient(135deg,#fbbf24,#f97316);color:#2a1500;box-shadow:0 10px 22px -10px rgba(249,115,22,.7)}
+body .bg-slate-900{background-image:linear-gradient(135deg,#241a63,#3b2a99);background-color:#241a63}
+body [class*="from-slate-900"],body [class*="via-blue-950"],body [class*="to-indigo-950"],body [class*="to-blue-950"],body [class*="via-slate-900"]{background-image:linear-gradient(160deg,#1c1450 0%,#2b1b73 48%,#0d3b47 100%)}
+body [class*="from-indigo-600"],body [class*="from-blue-600"],body [class*="to-indigo-700"]{background-image:linear-gradient(135deg,#6d5df6,#9b5cf6 60%,#c084fc)}
+body .text-blue-600,body .text-blue-700,body .text-blue-800,body .text-sky-700,body .text-sky-800{color:#5b4bd6}
+body .bg-blue-100,body .bg-blue-50,body .bg-sky-100,body .bg-sky-50{background-color:#efeaff}
+body .border-blue-200,body .border-sky-200{border-color:#ddd6fe}
+body .ring-blue-600{--tw-ring-color:#8b5cf6}
+body .bg-slate-100{background-color:#efecfb}
+body .bg-white.rounded-3xl,body .bg-white.rounded-2xl{background:rgba(255,255,255,.84);backdrop-filter:blur(16px) saturate(1.3);-webkit-backdrop-filter:blur(16px) saturate(1.3);border-color:rgba(124,106,246,.15);box-shadow:0 1px 2px rgba(28,20,80,.04),0 20px 42px -24px rgba(76,56,180,.38)}
+body input,body select,body textarea{border-radius:14px;border-color:#ddd6fe;background-color:rgba(255,255,255,.92)}
+body input:focus,body select:focus,body textarea:focus{outline:none;border-color:#8b5cf6;box-shadow:0 0 0 4px rgba(139,92,246,.18)}
+body button{cursor:pointer}
+body button:not(:disabled):hover{transform:translateY(-1px)}
+body button:not(:disabled):active{transform:scale(.97)}
+body header,body .sticky{backdrop-filter:blur(16px) saturate(1.3);-webkit-backdrop-filter:blur(16px) saturate(1.3)}
+.langw{position:fixed;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 96px);z-index:60;font:700 12px Inter,system-ui,sans-serif}
+.langb{display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.92);color:#3b2a99;border:1px solid rgba(124,106,246,.25);box-shadow:0 10px 24px -10px rgba(76,56,180,.5);backdrop-filter:blur(10px)}
+.langm{position:absolute;left:0;bottom:46px;display:flex;flex-direction:column;gap:2px;padding:6px;border-radius:16px;background:rgba(255,255,255,.96);border:1px solid rgba(124,106,246,.2);box-shadow:0 16px 32px -12px rgba(76,56,180,.5)}
+.langm[hidden]{display:none}
+.langm button{padding:8px 16px;border-radius:10px;text-align:left;color:#3b2a99;background:transparent}
+.langm button.on{background:linear-gradient(135deg,#6d5df6,#9b5cf6);color:#fff}
+@media(min-width:1024px){.langw{left:auto;right:20px;bottom:104px}.langm{left:auto;right:0}}
+@media(max-width:1023px){body main{padding-bottom:7.5rem}}
+</style>
+</head>
+<body class="text-slate-900">
+<div id="app"></div>
+<div id="toast" class="fixed top-20 right-4 left-4 sm:left-auto z-[9999] flex flex-col gap-2 sm:max-w-sm"></div>
+<dialog id="dlg" class="m-auto rounded-3xl p-0 w-[92%] max-w-md backdrop:bg-slate-900/60">
+ <form id="rf" class="p-6 space-y-3">
+  <h3 class="font-bold text-lg">Жөндеуді растау</h3>
+  <label class="block text-xs font-bold text-slate-600">Орындалған жұмыс<textarea id="rn" rows="2" required class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm font-normal outline-none focus:ring-2 focus:ring-emerald-600">Ақау жөнделді, толық тексерілді.</textarea></label>
+  <label class="block text-xs font-bold text-slate-600">Жөндегеннен кейінгі фото<input id="rp" type="file" accept="image/*" class="block mt-1 text-xs font-normal"></label>
+  <div class="flex justify-end gap-2 pt-1"><button type="button" id="rc" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">Бас тарту</button><button class="px-5 py-2.5 rounded-xl text-xs font-extrabold bg-emerald-600 hover:bg-emerald-700 text-white">✅ Жөнделді</button></div>
+ </form>
+</dialog>
+<script>
+/* ---------- 3 тіл: kk / ru / en. Аудармалар сөздікте (L). Жоқ мәтін қазақша қалады ---------- */
+(function(){
+const L={
+ru:{
+'Smart Dormitory • Алматы':'Smart Dormitory • Алматы',
+'Жатақханадағы ақауды':'Сообщите о поломке в общежитии за','15 секундта':'15 секунд','хабарлаңыз':'',
+'Ortaq Campus: Алматы ЖОО жатақханаларының ортақ жүйесі. Студент QR арқылы өтінім жібереді, әкімшілік жедел көреді, шебер жөндейді.':'Ortaq Campus — единая система общежитий вузов Алматы. Студент отправляет заявку по QR, администрация сразу её видит, мастер чинит.',
+'📝 Өтініш беру':'📝 Подать заявку','Кіру →':'Войти →','Кіру':'Войти','Тіркелу':'Регистрация',
+'ЖОО':'вузов','қолжетімді':'доступно','тіл':'языка',
+'Қалай жұмыс істейді':'Как это работает','ЖОО-лар':'Вузы','Мүмкіндіктер':'Возможности',
+'Қалай жұмыс істейді?':'Как это работает?','Төрт қарапайым қадам':'Четыре простых шага',
+'QR сканерлеңіз':'Сканируйте QR','Жатақханадағы QR-кодты телефонмен сканерлеңіз.':'Отсканируйте QR-код в общежитии телефоном.',
+'Ақауды сипаттаңыз':'Опишите поломку','Бөлме, санат пен фото: 15 секунд жеткілікті.':'Комната, категория и фото: хватит 15 секунд.',
+'Әкімшілік біледі':'Администрация узнает','Өтінім сіздің ЖОО әкімшілігіне бірден жетеді.':'Заявка сразу попадает администрации вашего вуза.',
+'Жөнделді':'Исправлено','Статусты қадағалаңыз: Ақау бар → Қабылданды → Жөнделуде → Жөнделді.':'Следите за статусом: Неисправность → Принято → Ремонтируется → Исправлено.',
+'Қосылған ЖОО-лар':'Подключённые вузы','Өз университетіңізді таңдап, тіркеліңіз':'Выберите свой университет и зарегистрируйтесь','Жатақхана':'Общежитие',
+'Тірі карта':'Живая карта','Ақау картада қызыл болып жанады, жөнделген соң жасыл болады.':'Поломка горит красным на карте, после ремонта становится зелёной.',
+'Әр ЖОО жеке':'Каждый вуз отдельно','Әкімшілік тек өз университетінің өтінімдерін көреді.':'Администрация видит только заявки своего университета.',
+'ЖИ көмекші':'ИИ-помощник','Қазақша, орысша, ағылшынша сұрақтарға жауап береді.':'Отвечает на вопросы на казахском, русском и английском.',
+'Төтенше нөмірлер':'Экстренные номера','112, 101, 102, 103, 104 бір түртумен қол жетімді.':'112, 101, 102, 103, 104 доступны одним касанием.',
+'Бастауға дайынсыз ба?':'Готовы начать?','Тіркеліңіз немесе кіріңіз, ақау туралы бірден хабарлаңыз.':'Зарегистрируйтесь или войдите и сразу сообщите о поломке.',
+'© Ortaq Campus • Алматы':'© Ortaq Campus • Алматы','Төтенше:':'Экстренные:',
+'← Басты бет':'← На главную',
+'Жатақханадағы ақауды 15 секундта хабарлаңыз. Өтінім картада ҚЫЗЫЛ болып жанады, жөнделген соң ЖАСЫЛ болады.':'Сообщите о поломке в общежитии за 15 секунд. Заявка горит КРАСНЫМ на карте, после ремонта становится ЗЕЛЁНОЙ.',
+'Аты-жөні':'ФИО','Құпиясөз (кемінде 8 таңба)':'Пароль (минимум 8 символов)',
+'Жеке код (тек әкімші / әзірлеуші үшін)':'Личный код (только для админа / разработчика)',
+'Университет / жатақхана':'Университет / общежитие','Бөлме нөмірі':'Номер комнаты',
+'Университет коды (өз университетіңіздің әкімшілігінен алыңыз)':'Код университета (получите в администрации своего университета)',
+'Әкімшілік панелі':'Панель администрации','Әзірлеуші мәзірі':'Меню разработчика','Студент кабинеті':'Кабинет студента',
+'Барлық ЖОО • Super Admin':'Все вузы • Super Admin','Шығу':'Выйти','← Әзірлеуші мәзірі':'← Меню разработчика',
+'Өтініш беру':'Подать заявку','Карта':'Карта','Аналитика & Жоба туралы':'Аналитика и о проекте','Байланыс & Төтенше нөмірлер':'Контакты и экстренные номера','🧑‍💻 Әзірлеуші':'🧑‍💻 Разработчик',
+'Серверге қосылу мүмкін болмады. Интернетті тексеріңіз':'Не удалось подключиться к серверу. Проверьте интернет',
+'Email немесе құпия сөз қате':'Неверный email или пароль','Email, құпиясөз немесе жеке код қате':'Неверный email, пароль или личный код',
+'Тым көп әрекет. 10 минуттан кейін қайталаңыз':'Слишком много попыток. Повторите через 10 минут',
+'Университет коды қате. Кодты өз университетіңіздің әкімшілігінен алыңыз':'Неверный код университета. Получите код в администрации своего университета',
+'Бұл email тіркелген':'Этот email уже зарегистрирован','Қате шықты':'Произошла ошибка'
+},
+en:{
+'Smart Dormitory • Алматы':'Smart Dormitory • Almaty',
+'Жатақханадағы ақауды':'Report a dorm problem in','15 секундта':'15 seconds','хабарлаңыз':'',
+'Ortaq Campus: Алматы ЖОО жатақханаларының ортақ жүйесі. Студент QR арқылы өтінім жібереді, әкімшілік жедел көреді, шебер жөндейді.':'Ortaq Campus is a shared system for Almaty university dormitories. Students send a request via QR, the administration sees it instantly, a technician fixes it.',
+'📝 Өтініш беру':'📝 Submit a request','Кіру →':'Log in →','Кіру':'Log in','Тіркелу':'Sign up',
+'ЖОО':'universities','қолжетімді':'available','тіл':'languages',
+'Қалай жұмыс істейді':'How it works','ЖОО-лар':'Universities','Мүмкіндіктер':'Features',
+'Қалай жұмыс істейді?':'How does it work?','Төрт қарапайым қадам':'Four simple steps',
+'QR сканерлеңіз':'Scan the QR','Жатақханадағы QR-кодты телефонмен сканерлеңіз.':'Scan the QR code in the dormitory with your phone.',
+'Ақауды сипаттаңыз':'Describe the problem','Бөлме, санат пен фото: 15 секунд жеткілікті.':'Room, category and photo: 15 seconds is enough.',
+'Әкімшілік біледі':'Administration is notified','Өтінім сіздің ЖОО әкімшілігіне бірден жетеді.':'Your request goes straight to your university administration.',
+'Жөнделді':'Fixed','Статусты қадағалаңыз: Ақау бар → Қабылданды → Жөнделуде → Жөнделді.':'Track the status: Problem → Accepted → In repair → Fixed.',
+'Қосылған ЖОО-лар':'Connected universities','Өз университетіңізді таңдап, тіркеліңіз':'Choose your university and sign up','Жатақхана':'Dormitory',
+'Тірі карта':'Live map','Ақау картада қызыл болып жанады, жөнделген соң жасыл болады.':'A problem glows red on the map and turns green once fixed.',
+'Әр ЖОО жеке':'Each university separate','Әкімшілік тек өз университетінің өтінімдерін көреді.':'Administrators only see requests from their own university.',
+'ЖИ көмекші':'AI assistant','Қазақша, орысша, ағылшынша сұрақтарға жауап береді.':'Answers questions in Kazakh, Russian and English.',
+'Төтенше нөмірлер':'Emergency numbers','112, 101, 102, 103, 104 бір түртумен қол жетімді.':'112, 101, 102, 103, 104 are one tap away.',
+'Бастауға дайынсыз ба?':'Ready to start?','Тіркеліңіз немесе кіріңіз, ақау туралы бірден хабарлаңыз.':'Sign up or log in and report a problem right away.',
+'© Ortaq Campus • Алматы':'© Ortaq Campus • Almaty','Төтенше:':'Emergency:',
+'← Басты бет':'← Home',
+'Жатақханадағы ақауды 15 секундта хабарлаңыз. Өтінім картада ҚЫЗЫЛ болып жанады, жөнделген соң ЖАСЫЛ болады.':'Report a dorm problem in 15 seconds. Your request glows RED on the map and turns GREEN once fixed.',
+'Аты-жөні':'Full name','Құпиясөз (кемінде 8 таңба)':'Password (at least 8 characters)',
+'Жеке код (тек әкімші / әзірлеуші үшін)':'Personal code (admin / developer only)',
+'Университет / жатақхана':'University / dormitory','Бөлме нөмірі':'Room number',
+'Университет коды (өз университетіңіздің әкімшілігінен алыңыз)':'University code (get it from your university administration)',
+'Әкімшілік панелі':'Admin panel','Әзірлеуші мәзірі':'Developer menu','Студент кабинеті':'Student account',
+'Барлық ЖОО • Super Admin':'All universities • Super Admin','Шығу':'Log out','← Әзірлеуші мәзірі':'← Developer menu',
+'Өтініш беру':'Submit a request','Карта':'Map','Аналитика & Жоба туралы':'Analytics & About','Байланыс & Төтенше нөмірлер':'Contacts & Emergency numbers','🧑‍💻 Әзірлеуші':'🧑‍💻 Developer',
+'Серверге қосылу мүмкін болмады. Интернетті тексеріңіз':'Could not reach the server. Check your internet',
+'Email немесе құпия сөз қате':'Wrong email or password','Email, құпиясөз немесе жеке код қате':'Wrong email, password or personal code',
+'Тым көп әрекет. 10 минуттан кейін қайталаңыз':'Too many attempts. Try again in 10 minutes',
+'Университет коды қате. Кодты өз университетіңіздің әкімшілігінен алыңыз':'Wrong university code. Get the code from your university administration',
+'Бұл email тіркелген':'This email is already registered','Қате шықты':'Something went wrong'
+}};
+Object.assign(L.ru,{'Бөлмеде бірдеңе сынды ма? QR-ды сканерлеп, 15 секундта хабарлаңыз!':'Что-то сломалось в комнате? Отсканируйте QR и сообщите за 15 секунд!','Өтінім әкімшілікке жедел түсіп, картада ҚЫЗЫЛ белгімен жанады, жөнделген соң ЖАСЫЛ болады.':'Заявка сразу попадает администрации и горит КРАСНЫМ на карте, после ремонта становится ЗЕЛЁНОЙ.','🏫 Сіздің ЖОО':'🏫 Ваш вуз','📷 QR арқылы ашылды':'📷 Открыто по QR','Өтінім осы университеттің әкімшілігіне автоматты жіберіледі. Жатақханадағы QR-ды сканерлесеңіз, жүйе өз ЖОО-ңызды өзі таңдайды.':'Заявка автоматически уходит администрации этого университета. Если отсканировать QR в общежитии, система сама выберет ваш вуз.','Ақау туралы өтінім':'Заявка о поломке','Бөлме':'Комната','Санат':'Категория','Маңыздылығы':'Срочность','Сипаттамасы':'Описание','Фото:':'Фото:','🚪 Есік':'🚪 Дверь','🚰 Су':'🚰 Вода','⚡ Электр':'⚡ Электричество','📍 Қайта сұрау':'📍 Запросить снова','⏳ Геолокация тексерілуде…':'⏳ Проверка геолокации…','Әкімшілікке жіберу':'Отправить администрации','Барлық өтінімдер':'Все заявки','Әзірге өтінім жоқ.':'Заявок пока нет.','🚪 Есік / Құлып':'🚪 Дверь / Замок','🚰 Сантехника':'🚰 Сантехника','⚡ Электр жарығы':'⚡ Электрическое освещение','🪑 Жиһаз / Терезе':'🪑 Мебель / Окно','🌡️ Жылу / Wi-Fi':'🌡️ Отопление / Wi-Fi','Шұғыл':'Срочно','Орташа':'Средняя','Жоспарлы':'Плановая','🔴 Ақау бар':'🔴 Неисправность','🛠️ Жөнделуде':'🛠️ Ремонтируется','🟢 Жөнделді':'🟢 Исправлено','Жіберілді':'Отправлено','Қабылданды':'Принято','Жөнделуде':'Ремонтируется','📍 Геолокация расталған':'📍 Геолокация подтверждена','📥 Қабылдау':'📥 Принять','📡 GPS сигналы жоқ, күте тұрыңыз…':'📡 Нет сигнала GPS, подождите…','⏳ Геолокацияға рұқсат сұралуда…':'⏳ Запрос доступа к геолокации…','📍 Сіз осындасыз':'📍 Вы здесь','Алдымен геолокацияға рұқсат беріңіз':'Сначала разрешите доступ к геолокации','Браузер геолокацияны қолдамайды':'Браузер не поддерживает геолокацию','Өтінім жіберу бұғатталды':'Отправка заявки заблокирована','Әзірлеуші: геолокация тексерілмейді':'Разработчик: геолокация не проверяется'});
+Object.assign(L.en,{'Бөлмеде бірдеңе сынды ма? QR-ды сканерлеп, 15 секундта хабарлаңыз!':'Something broke in your room? Scan the QR and report it in 15 seconds!','Өтінім әкімшілікке жедел түсіп, картада ҚЫЗЫЛ белгімен жанады, жөнделген соң ЖАСЫЛ болады.':'Your request reaches the administration instantly, glows RED on the map and turns GREEN once fixed.','🏫 Сіздің ЖОО':'🏫 Your university','📷 QR арқылы ашылды':'📷 Opened via QR','Өтінім осы университеттің әкімшілігіне автоматты жіберіледі. Жатақханадағы QR-ды сканерлесеңіз, жүйе өз ЖОО-ңызды өзі таңдайды.':"The request is sent automatically to this university's administration. Scan the QR in your dormitory and the system picks your university.",'Ақау туралы өтінім':'Problem report','Бөлме':'Room','Санат':'Category','Маңыздылығы':'Priority','Сипаттамасы':'Description','Фото:':'Photo:','🚪 Есік':'🚪 Door','🚰 Су':'🚰 Water','⚡ Электр':'⚡ Electricity','📍 Қайта сұрау':'📍 Ask again','⏳ Геолокация тексерілуде…':'⏳ Checking location…','Әкімшілікке жіберу':'Send to administration','Барлық өтінімдер':'All requests','Әзірге өтінім жоқ.':'No requests yet.','🚪 Есік / Құлып':'🚪 Door / Lock','🚰 Сантехника':'🚰 Plumbing','⚡ Электр жарығы':'⚡ Electric lighting','🪑 Жиһаз / Терезе':'🪑 Furniture / Window','🌡️ Жылу / Wi-Fi':'🌡️ Heating / Wi-Fi','Шұғыл':'Urgent','Орташа':'Medium','Жоспарлы':'Planned','🔴 Ақау бар':'🔴 Problem','🛠️ Жөнделуде':'🛠️ In repair','🟢 Жөнделді':'🟢 Fixed','Жіберілді':'Sent','Қабылданды':'Accepted','Жөнделуде':'In repair','📍 Геолокация расталған':'📍 Location verified','📥 Қабылдау':'📥 Accept','📡 GPS сигналы жоқ, күте тұрыңыз…':'📡 No GPS signal, please wait…','⏳ Геолокацияға рұқсат сұралуда…':'⏳ Requesting location access…','📍 Сіз осындасыз':'📍 You are here','Алдымен геолокацияға рұқсат беріңіз':'Please allow location access first','Браузер геолокацияны қолдамайды':'Your browser does not support geolocation','Өтінім жіберу бұғатталды':'Submitting is blocked','Әзірлеуші: геолокация тексерілмейді':'Developer: location is not checked'});
+Object.assign(L.ru,{'Абай атындағы ҚазҰПУ':'КазНПУ имени Абая','Әл-Фараби атындағы ҚазҰУ':'КазНУ имени аль-Фараби','Satbayev University':'Satbayev University','ҚБТУ':'КБТУ','SDU University':'SDU University','ХАТУ / IITU':'МУИТ / IITU','С.Ж. Асфендияров атындағы ҚазҰМУ':'КазНМУ имени С.Д. Асфендиярова','№3 жатақхана':'Общежитие №3','№5 жатақхана':'Общежитие №5','№2 жатақхана':'Общежитие №2','Студенттер үйі':'Дом студентов','жатақхана':'общежитие','Уәлиханов көш., 64':'ул. Валиханова, 64','Әл-Фараби даңғ., 71/19':'пр. аль-Фараби, 71/19','Сәтбаев көш., 22Б':'ул. Сатпаева, 22Б','Ислам Каримов көш., 70':'ул. Ислама Каримова, 70','Абылай хан көш., 1/1, Қаскелең':'ул. Абылай хана, 1/1, Каскелен','Манас көш., 34/1':'ул. Манаса, 34/1','Төле би көш., 94':'ул. Толе би, 94','Абай атындағы ҚазҰПУ — №3 жатақхана':'КазНПУ имени Абая — Общежитие №3','Әл-Фараби атындағы ҚазҰУ — №5 жатақхана':'КазНУ имени аль-Фараби — Общежитие №5','Satbayev University — №2 жатақхана':'Satbayev University — Общежитие №2','ҚБТУ — Студенттер үйі':'КБТУ — Дом студентов','SDU University — жатақхана':'SDU University — общежитие','ХАТУ / IITU — жатақхана':'МУИТ / IITU — общежитие','С.Ж. Асфендияров атындағы ҚазҰМУ — жатақхана':'КазНМУ имени С.Д. Асфендиярова — общежитие','Сұрағыңызды жазыңыз':'Напишите вопрос','Жатақхана мен өтінімдер туралы сұраңыз':'Спросите об общежитии и заявках','Жіберу':'Отправить','ЖИ ойланып жатыр…':'ИИ думает…','Сәлем! Жатақхана, өтінім жіберу немесе төтенше жағдай туралы сұраңыз.':'Привет! Спросите про общежитие, подачу заявки или экстренные ситуации.','Жауап келмеді, қайта жазып көріңіз.':'Ответа нет, попробуйте написать ещё раз.','⚠️ ЖИ 45 секунд жауап бермеді. Қайта жазып көріңіз.':'⚠️ ИИ не ответил за 45 секунд. Попробуйте ещё раз.'});
+Object.assign(L.en,{'Абай атындағы ҚазҰПУ':'Abai KazNPU','Әл-Фараби атындағы ҚазҰУ':'Al-Farabi KazNU','Satbayev University':'Satbayev University','ҚБТУ':'KBTU','SDU University':'SDU University','ХАТУ / IITU':'IITU','С.Ж. Асфендияров атындағы ҚазҰМУ':'Asfendiyarov KazNMU','№3 жатақхана':'Dormitory №3','№5 жатақхана':'Dormitory №5','№2 жатақхана':'Dormitory №2','Студенттер үйі':'Student House','жатақхана':'dormitory','Уәлиханов көш., 64':'Valikhanov St., 64','Әл-Фараби даңғ., 71/19':'Al-Farabi Ave., 71/19','Сәтбаев көш., 22Б':'Satpayev St., 22B','Ислам Каримов көш., 70':'Islam Karimov St., 70','Абылай хан көш., 1/1, Қаскелең':'Abylai Khan St., 1/1, Kaskelen','Манас көш., 34/1':'Manas St., 34/1','Төле би көш., 94':'Tole Bi St., 94','Абай атындағы ҚазҰПУ — №3 жатақхана':'Abai KazNPU — Dormitory №3','Әл-Фараби атындағы ҚазҰУ — №5 жатақхана':'Al-Farabi KazNU — Dormitory №5','Satbayev University — №2 жатақхана':'Satbayev University — Dormitory №2','ҚБТУ — Студенттер үйі':'KBTU — Student House','SDU University — жатақхана':'SDU University — dormitory','ХАТУ / IITU — жатақхана':'IITU — dormitory','С.Ж. Асфендияров атындағы ҚазҰМУ — жатақхана':'Asfendiyarov KazNMU — dormitory','Сұрағыңызды жазыңыз':'Type your question','Жатақхана мен өтінімдер туралы сұраңыз':'Ask about dorms and requests','Жіберу':'Send','ЖИ ойланып жатыр…':'AI is thinking…','Сәлем! Жатақхана, өтінім жіберу немесе төтенше жағдай туралы сұраңыз.':'Hi! Ask me about the dormitory, submitting a request or emergencies.','Жауап келмеді, қайта жазып көріңіз.':'No answer, please try again.','⚠️ ЖИ 45 секунд жауап бермеді. Қайта жазып көріңіз.':'⚠️ The AI did not respond in 45 seconds. Please try again.'});
+Object.assign(L.ru,{'Әзірлеуші':'Разработчик'});Object.assign(L.en,{'Әзірлеуші':'Developer'});
+Object.assign(L.ru,{'Жөндеуді растау':'Подтверждение ремонта','Орындалған жұмыс':'Выполненная работа','Ақау жөнделді, толық тексерілді.':'Неисправность устранена, всё проверено.','Жөндегеннен кейінгі фото':'Фото после ремонта','Бас тарту':'Отмена','🚫 Геолокацияға рұқсат берілмеген (браузер баптауын және HTTPS-ті тексеріңіз). Өтінім жіберу бұғатталды':'🚫 Доступ к геолокации не разрешён (проверьте настройки браузера и HTTPS). Отправка заявки заблокирована','🚫 Геолокацияға рұқсат берілмеген (браузер баптауын және HTTPS-ті тексеріңіз)':'🚫 Доступ к геолокации не разрешён (проверьте настройки браузера и HTTPS)','Өтінім':'Заявка','Байланыс':'Контакты','Барлығы':'Все','🔴 Ашық':'🔴 Открытые','Университет немесе бөлме...':'Университет или комната...','Ештеңе табылмады.':'Ничего не найдено.','Карта жүктелуде…':'Карта загружается…','🆘 Төтенше және құқық қорғау нөмірлері':'🆘 Экстренные номера и правоохранительные органы','Нөмірді басыңыз, қоңырау шалынады. Қауіп төніп тұрса, алдымен 112-ге қоңырау шалыңыз.':'Нажмите на номер, чтобы позвонить. При опасности сначала звоните 112.','Бірыңғай құтқару қызметі':'Единая служба спасения','Полиция':'Полиция','Жедел жәрдем':'Скорая помощь','Өрт сөндіру қызметі':'Пожарная служба','Газ апаттық қызметі':'Аварийная газовая служба','ҰҚК сенім телефоны':'Телефон доверия КНБ','ІІМ бірыңғай сенім телефоны':'Единый телефон доверия МВД','Бас прокуратура (call-орталық)':'Генеральная прокуратура (колл-центр)','Сыбайлас жемқорлыққа қарсы қызмет (Антикор)':'Антикоррупционная служба (Антикор)','Отбасы, әйелдер мен балаларға көмек':'Помощь семье, женщинам и детям','Психологиялық көмек':'Психологическая помощь','Әлі көрсетілмеген':'Пока не указано','Әкімшілік':'Администрация','🔑 Университетіңіздің студент коды':'🔑 Студенческий код вашего университета','Кодты тек өз студенттеріңізге беріңіз: код пен ЖОО поштасы болмаса, тіркелу мүмкін емес.':'Передавайте код только своим студентам: без кода и почты вуза регистрация невозможна.','Барлық өтінім':'Все заявки','Тіркелген студенттер:':'Зарегистрированные студенты:','Әр ЖОО-ның QR-ы бірегей: сканерлегенде сайт сол университетті автоматты ашады. Жүктеп алып, жатақханаға іліңіз.':'У каждого вуза свой QR: при сканировании сайт автоматически открывает этот университет. Скачайте и повесьте в общежитии.','📋 Сілтеме':'📋 Ссылка','Бұл сүзгі бойынша өтінім жоқ.':'По этому фильтру заявок нет.','Статус':'Статус','Уақыт':'Время','Өтінім жоқ':'Заявок нет','Панель':'Панель','Аналитика':'Аналитика','Ortaq Campus — Алматы ЖОО инфрақұрылымын цифрландыру':'Ortaq Campus — цифровизация инфраструктуры вузов Алматы','Жоба студенттер мен әкімшілік арасындағы ақпараттық алшақтықты жояды: ақауды анықтау уақыты 3 күннен 15 секундқа дейін қысқарады.':'Проект устраняет информационный разрыв между студентами и администрацией: время выявления поломки сокращается с 3 дней до 15 секунд.','Ақау санаттары бойынша үлес':'Доля по категориям поломок','ЖОО бойынша жөндеу тиімділігі':'Эффективность ремонта по вузам','QR-кодты сканерлеу':'Сканирование QR-кода','Студент есіктегі QR-ды сканерлеп, фото мен сипаттама жібереді.':'Студент сканирует QR на двери и отправляет фото и описание.','Картада ҚЫЗЫЛ белгі':'КРАСНАЯ метка на карте','Әкімшілікке хабар түсіп, картада қызыл белгі жанады.':'Администрация получает уведомление, на карте загорается красная метка.','Шеберге тапсырма':'Задание мастеру','Жауапты маман тағайындалып, ақауды жөндейді.':'Назначается ответственный специалист и устраняет поломку.','ЖАСЫЛ белгі және есеп':'ЗЕЛЁНАЯ метка и отчёт','Жөнделген фото жүктелген соң белгі жасылға ауысады.':'После загрузки фото ремонта метка становится зелёной.','Жатақхана ережелері':'Правила общежития','Үлгі ережелер: әр ЖОО өз ережесін қолданады.':'Примерные правила: каждый вуз применяет свои.','🕒 Тыныштық сағаттары':'🕒 Часы тишины','23:00-ден 07:00-ге дейін тыныштық сақталады, басқа студенттердің демалысына кедергі келтіруге болмайды.':'С 23:00 до 07:00 соблюдается тишина, нельзя мешать отдыху других студентов.','📍 Геолокация бақылауы':'📍 Контроль геолокации','Жалған өтінімдердің алдын алу үшін ақауды жатақхана аумағында жүрген студент қана тіркей алады.':'Чтобы исключить ложные заявки, поломку может зарегистрировать только студент, находящийся на территории общежития.','🔥 Өрт және электр қауіпсіздігі':'🔥 Пожарная и электробезопасность','Бөлмеде қолдан жасалған жылытқышты, ашық отты қолдануға және бөгде адамдарды рұқсатсыз кіргізуге болмайды.':'В комнате нельзя использовать самодельные обогреватели, открытый огонь и пускать посторонних без разрешения.','🪪 ЖОО верификациясы':'🪪 Верификация вуза','Студент тек өз университетінің корпоративтік поштасымен және университет коды арқылы тіркеле алады. Әркім тек өз университетінің деректерін көреді.':'Студент может зарегистрироваться только с корпоративной почтой своего университета и кодом университета. Каждый видит только данные своего университета.','Телефон':'Телефон','Сақтау':'Сохранить','Барлық ЖОО':'Все вузы','Әзірл.':'Разраб.','Дейін':'До','Кейін':'После','Сантехник':'Сантехник','Электрик':'Электрик','Плотник':'Плотник','Есіктің құлпы мен топсасы сынған, есік жабылмайды.':'Сломаны замок и петли двери, дверь не закрывается.','Жуынатын бөлмедегі краннан су ағып тұр.':'В умывальной течёт кран.','Оқу бөлмесіндегі жарық шамдары жанып кеткен.':'В читальной комнате перегорели лампы.','✅ LED шамдар жаңасына ауыстырылды.':'✅ LED-лампы заменены на новые.','Кез келген қолданушы ретінде кіріп, студент пен әкімші беттерін тексеріңіз. Өтінім статусын «Әкімшілік панелі» бетінде кез келген мәнге өзгерте аласыз.':'Войдите как любой пользователь и проверьте страницы студента и администратора. Статус заявки можно изменить на любое значение на странице «Панель администрации».','👤 Демо студент қосу':'👤 Добавить демо-студента','🛡️ Демо әкімші қосу':'🛡️ Добавить демо-администратора','♻️ Өтінімдерді қалпына келтіру':'♻️ Сбросить заявки','🗑️ Өзімнен басқаларды өшіру':'🗑️ Удалить всех, кроме меня','📨 Telegram тест':'📨 Тест Telegram','⬇️ JSON көшірме':'⬇️ Копия JSON','Аты':'Имя','Рөл':'Роль'});
+Object.assign(L.en,{'Жөндеуді растау':'Repair confirmation','Орындалған жұмыс':'Work done','Ақау жөнделді, толық тексерілді.':'The problem is fixed and fully checked.','Жөндегеннен кейінгі фото':'Photo after repair','Бас тарту':'Cancel','🚫 Геолокацияға рұқсат берілмеген (браузер баптауын және HTTPS-ті тексеріңіз). Өтінім жіберу бұғатталды':'🚫 Location access denied (check browser settings and HTTPS). Submitting is blocked','🚫 Геолокацияға рұқсат берілмеген (браузер баптауын және HTTPS-ті тексеріңіз)':'🚫 Location access denied (check browser settings and HTTPS)','Өтінім':'Request','Байланыс':'Contacts','Барлығы':'All','🔴 Ашық':'🔴 Open','Университет немесе бөлме...':'University or room...','Ештеңе табылмады.':'Nothing found.','Карта жүктелуде…':'Loading map…','🆘 Төтенше және құқық қорғау нөмірлері':'🆘 Emergency and law enforcement numbers','Нөмірді басыңыз, қоңырау шалынады. Қауіп төніп тұрса, алдымен 112-ге қоңырау шалыңыз.':'Tap a number to call. If you are in danger, call 112 first.','Бірыңғай құтқару қызметі':'Unified rescue service','Полиция':'Police','Жедел жәрдем':'Ambulance','Өрт сөндіру қызметі':'Fire service','Газ апаттық қызметі':'Gas emergency service','ҰҚК сенім телефоны':'National Security Committee hotline','ІІМ бірыңғай сенім телефоны':'Ministry of Internal Affairs hotline','Бас прокуратура (call-орталық)':"Prosecutor General's Office (call center)",'Сыбайлас жемқорлыққа қарсы қызмет (Антикор)':'Anti-Corruption Agency (Anticor)','Отбасы, әйелдер мен балаларға көмек':'Help for families, women and children','Психологиялық көмек':'Psychological help','Әлі көрсетілмеген':'Not specified yet','Әкімшілік':'Administration','🔑 Университетіңіздің студент коды':"🔑 Your university's student code",'Кодты тек өз студенттеріңізге беріңіз: код пен ЖОО поштасы болмаса, тіркелу мүмкін емес.':'Give the code only to your own students: sign-up is impossible without the code and a university email.','Барлық өтінім':'All requests','Тіркелген студенттер:':'Registered students:','Әр ЖОО-ның QR-ы бірегей: сканерлегенде сайт сол университетті автоматты ашады. Жүктеп алып, жатақханаға іліңіз.':'Each university has a unique QR: scanning it opens that university automatically. Download it and hang it in the dormitory.','📋 Сілтеме':'📋 Link','Бұл сүзгі бойынша өтінім жоқ.':'No requests match this filter.','Статус':'Status','Уақыт':'Time','Өтінім жоқ':'No requests','Панель':'Dashboard','Аналитика':'Analytics','Ortaq Campus — Алматы ЖОО инфрақұрылымын цифрландыру':'Ortaq Campus — digitalizing Almaty university infrastructure','Жоба студенттер мен әкімшілік арасындағы ақпараттық алшақтықты жояды: ақауды анықтау уақыты 3 күннен 15 секундқа дейін қысқарады.':'The project closes the information gap between students and administration: problem detection time drops from 3 days to 15 seconds.','Ақау санаттары бойынша үлес':'Share by problem category','ЖОО бойынша жөндеу тиімділігі':'Repair efficiency by university','QR-кодты сканерлеу':'Scan the QR code','Студент есіктегі QR-ды сканерлеп, фото мен сипаттама жібереді.':'The student scans the QR on the door and sends a photo and description.','Картада ҚЫЗЫЛ белгі':'RED marker on the map','Әкімшілікке хабар түсіп, картада қызыл белгі жанады.':'The administration is notified and a red marker lights up on the map.','Шеберге тапсырма':'Task for the technician','Жауапты маман тағайындалып, ақауды жөндейді.':'A responsible specialist is assigned and fixes the problem.','ЖАСЫЛ белгі және есеп':'GREEN marker and report','Жөнделген фото жүктелген соң белгі жасылға ауысады.':'Once the repair photo is uploaded, the marker turns green.','Жатақхана ережелері':'Dormitory rules','Үлгі ережелер: әр ЖОО өз ережесін қолданады.':'Sample rules: each university applies its own.','🕒 Тыныштық сағаттары':'🕒 Quiet hours','23:00-ден 07:00-ге дейін тыныштық сақталады, басқа студенттердің демалысына кедергі келтіруге болмайды.':"Quiet is kept from 23:00 to 07:00; do not disturb other students' rest.",'📍 Геолокация бақылауы':'📍 Location check','Жалған өтінімдердің алдын алу үшін ақауды жатақхана аумағында жүрген студент қана тіркей алады.':'To prevent false requests, only a student on the dormitory premises can report a problem.','🔥 Өрт және электр қауіпсіздігі':'🔥 Fire and electrical safety','Бөлмеде қолдан жасалған жылытқышты, ашық отты қолдануға және бөгде адамдарды рұқсатсыз кіргізуге болмайды.':'Homemade heaters, open flames and letting outsiders in without permission are not allowed in rooms.','🪪 ЖОО верификациясы':'🪪 University verification','Студент тек өз университетінің корпоративтік поштасымен және университет коды арқылы тіркеле алады. Әркім тек өз университетінің деректерін көреді.':"Students can only sign up with their own university email and university code. Everyone sees only their own university's data.",'Телефон':'Phone','Сақтау':'Save','Барлық ЖОО':'All universities','Әзірл.':'Dev','Дейін':'Before','Кейін':'After','Сантехник':'Plumber','Электрик':'Electrician','Плотник':'Carpenter','Есіктің құлпы мен топсасы сынған, есік жабылмайды.':'The door lock and hinge are broken, the door will not close.','Жуынатын бөлмедегі краннан су ағып тұр.':'A tap in the washroom is leaking.','Оқу бөлмесіндегі жарық шамдары жанып кеткен.':'The lights in the study room have burnt out.','✅ LED шамдар жаңасына ауыстырылды.':'✅ The LED lamps were replaced with new ones.','Кез келген қолданушы ретінде кіріп, студент пен әкімші беттерін тексеріңіз. Өтінім статусын «Әкімшілік панелі» бетінде кез келген мәнге өзгерте аласыз.':'Log in as any user and check the student and admin pages. You can change a request status to any value on the "Admin panel" page.','👤 Демо студент қосу':'👤 Add demo student','🛡️ Демо әкімші қосу':'🛡️ Add demo admin','♻️ Өтінімдерді қалпына келтіру':'♻️ Reset requests','🗑️ Өзімнен басқаларды өшіру':'🗑️ Delete everyone except me','📨 Telegram тест':'📨 Telegram test','⬇️ JSON көшірме':'⬇️ JSON copy','Аты':'Name','Рөл':'Role'});
+Object.assign(L.ru,{'Карта жүктелмеді. Интернетті тексеріп, бетті жаңартыңыз.':'Карта не загрузилась. Проверьте интернет и обновите страницу.','Карта жүктелмеді. Нүкте GPS орныңыз бойынша автоматты алынады.':'Карта не загрузилась. Точка берётся автоматически по вашему GPS.','QR кітапханасы жүктелмеді':'Библиотека QR не загрузилась','QR кітапханасы жүктелмеді. Интернетті тексеріңіз':'Библиотека QR не загрузилась. Проверьте интернет','Сіз':'Вы','QR-код сәтті сканерленді!':'QR-код успешно отсканирован!','Байланыс сақталды':'Контакты сохранены','Белсенді':'Активен','Бұл Telegram хабарламасының сынағы':'Это тест сообщения Telegram','Бұл демо қолданушы бар':'Такой демо-пользователь уже есть','Бөлме нөмірін жазыңыз':'Укажите номер комнаты','Демо қолданушы қосылды: «Осы ретінде кіру» батырмасы арқылы ашыңыз':'Демо-пользователь добавлен: откройте кнопкой «Войти как этот пользователь»','Жад толды: кішірек фото таңдаңыз':'Память заполнена: выберите фото поменьше','Жөнделді! Картада ЖАСЫЛ белгі жанды':'Исправлено! На карте загорелась ЗЕЛЁНАЯ метка','Өтінім жіберілді! Картада ҚЫЗЫЛ белгі жанды':'Заявка отправлена! На карте загорелась КРАСНАЯ метка','Өтінім қабылданды':'Заявка принята','Өтінімдер бастапқы қалпына келді':'Заявки сброшены','Статус өзгертілді':'Статус изменён','Сілтеме көшірілді':'Ссылка скопирована','Сілтеме:':'Ссылка:','Шебер тағайындалды':'Мастер назначен','белгісіз қате':'неизвестная ошибка','⚠️ Worker-ге қосылу мүмкін болмады':'⚠️ Не удалось подключиться к Worker','⚠️ Браузер геолокацияны қолдамайды':'⚠️ Браузер не поддерживает геолокацию','⚠️ Бұл QR басқа ЖОО-ға тиесілі. Өтінім өз ЖОО-ңызға жіберіледі':'⚠️ Этот QR относится к другому вузу. Заявка будет отправлена вашему вузу','🛡️ Әкімші':'🛡️ Администратор','🧑\u200d💻 Әзірлеуші: геолокация тексерілмейді':'🧑\u200d💻 Разработчик: геолокация не проверяется','📥 Қабылданды':'📥 Принято','Email дұрыс емес':'Некорректный email','Аты-жөніңізді жазыңыз':'Введите ФИО','ЖОО таңдалмаған':'Вуз не выбран','Құпия сөз кемінде 8 таңба болсын':'Пароль должен быть не короче 8 символов','Құпиясөз кемінде 8 таңба':'Пароль не короче 8 символов','Қайта кіріңіз':'Войдите заново','Рұқсат жоқ':'Нет доступа','Тым көп қате код. 10 минуттан кейін қайталаңыз':'Слишком много неверных кодов. Повторите через 10 минут','Бұл email қызметтік. «Кіру» арқылы жеке кодпен кіріңіз':'Этот email служебный. Войдите через «Войти» с личным кодом','Серверде STUDENT_CODES бапталмаған':'На сервере не настроен STUDENT_CODES','Студент өз ЖОО поштасымен тіркеледі':'Студент регистрируется с почтой своего вуза'});
+Object.assign(L.en,{'Карта жүктелмеді. Интернетті тексеріп, бетті жаңартыңыз.':'The map failed to load. Check your internet and refresh the page.','Карта жүктелмеді. Нүкте GPS орныңыз бойынша автоматты алынады.':'The map failed to load. The point is taken automatically from your GPS.','QR кітапханасы жүктелмеді':'The QR library failed to load','QR кітапханасы жүктелмеді. Интернетті тексеріңіз':'The QR library failed to load. Check your internet','Сіз':'You','QR-код сәтті сканерленді!':'QR code scanned successfully!','Байланыс сақталды':'Contacts saved','Белсенді':'Active','Бұл Telegram хабарламасының сынағы':'This is a Telegram message test','Бұл демо қолданушы бар':'This demo user already exists','Бөлме нөмірін жазыңыз':'Enter your room number','Демо қолданушы қосылды: «Осы ретінде кіру» батырмасы арқылы ашыңыз':'Demo user added: open it with the "Log in as this user" button','Жад толды: кішірек фото таңдаңыз':'Storage is full: choose a smaller photo','Жөнделді! Картада ЖАСЫЛ белгі жанды':'Fixed! A GREEN marker is now on the map','Өтінім жіберілді! Картада ҚЫЗЫЛ белгі жанды':'Request sent! A RED marker is now on the map','Өтінім қабылданды':'Request accepted','Өтінімдер бастапқы қалпына келді':'Requests were reset','Статус өзгертілді':'Status changed','Сілтеме көшірілді':'Link copied','Сілтеме:':'Link:','Шебер тағайындалды':'Technician assigned','белгісіз қате':'unknown error','⚠️ Worker-ге қосылу мүмкін болмады':'⚠️ Could not connect to the Worker','⚠️ Браузер геолокацияны қолдамайды':'⚠️ Your browser does not support geolocation','⚠️ Бұл QR басқа ЖОО-ға тиесілі. Өтінім өз ЖОО-ңызға жіберіледі':'⚠️ This QR belongs to another university. The request will go to your university','🛡️ Әкімші':'🛡️ Admin','🧑\u200d💻 Әзірлеуші: геолокация тексерілмейді':'🧑\u200d💻 Developer: location is not checked','📥 Қабылданды':'📥 Accepted','Email дұрыс емес':'Invalid email','Аты-жөніңізді жазыңыз':'Enter your full name','ЖОО таңдалмаған':'No university selected','Құпия сөз кемінде 8 таңба болсын':'Password must be at least 8 characters','Құпиясөз кемінде 8 таңба':'Password must be at least 8 characters','Қайта кіріңіз':'Please log in again','Рұқсат жоқ':'Access denied','Тым көп қате код. 10 минуттан кейін қайталаңыз':'Too many wrong codes. Try again in 10 minutes','Бұл email қызметтік. «Кіру» арқылы жеке кодпен кіріңіз':'This email is for staff. Use "Log in" with your personal code','Серверде STUDENT_CODES бапталмаған':'STUDENT_CODES is not set on the server','Студент өз ЖОО поштасымен тіркеледі':'Students sign up with their university email'});
+Object.assign(L.ru,{"Әзірлеуші:": "Разработчик:", "Әбіл Сейдаканов": "Абиль Сейдаканов", "🔔 Хабарламаларды қабылдау баптаулары": "🔔 Настройки уведомлений", "Жаңа өтінім түскенде хабар осы Telegram мен поштаға келеді.": "При новой заявке уведомление придёт в этот Telegram и на эту почту.", "ID алу үшін Telegram ботымызға кіріп /start басыңыз.": "Чтобы получить ID, откройте нашего Telegram-бота и нажмите /start.", "Email пошта": "Email (почта)", "Сақтау": "Сохранить", "Тест хабарлама жіберу": "Отправить тестовое уведомление", "Баптаулар сақталды": "Настройки сохранены", "Тест хабарлама жіберілді": "Тестовое уведомление отправлено", "Telegram ID тек сандардан тұруы керек": "Telegram ID должен состоять только из цифр", "Email дұрыс емес": "Email указан неверно", "Хабар кетпеді. Telegram ботқа /start басқаныңызды және Email дұрыстығын тексеріңіз": "Сообщение не отправлено. Проверьте, что нажали /start в Telegram-боте и что Email указан верно", "Telegram ID немесе Email сақталмаған": "Telegram ID или Email не сохранены", "Хабарлама баптауларын көру үшін жоғарыдағы тізімнен нақты ЖОО-ны таңдаңыз.": "Чтобы настроить уведомления, выберите конкретный вуз в списке выше."});Object.assign(L.en,{"Әзірлеуші:": "Developer:", "Әбіл Сейдаканов": "Abil Seidakanov", "🔔 Хабарламаларды қабылдау баптаулары": "🔔 Notification settings", "Жаңа өтінім түскенде хабар осы Telegram мен поштаға келеді.": "New requests are sent to this Telegram and email.", "ID алу үшін Telegram ботымызға кіріп /start басыңыз.": "To get your ID, open our Telegram bot and press /start.", "Email пошта": "Email", "Сақтау": "Save", "Тест хабарлама жіберу": "Send test notification", "Баптаулар сақталды": "Settings saved", "Тест хабарлама жіберілді": "Test notification sent", "Telegram ID тек сандардан тұруы керек": "Telegram ID must contain digits only", "Email дұрыс емес": "Invalid email", "Хабар кетпеді. Telegram ботқа /start басқаныңызды және Email дұрыстығын тексеріңіз": "Not sent. Check that you pressed /start in the Telegram bot and that the email is correct", "Telegram ID немесе Email сақталмаған": "No Telegram ID or email saved", "Хабарлама баптауларын көру үшін жоғарыдағы тізімнен нақты ЖОО-ны таңдаңыз.": "To set up notifications, pick a specific university in the list above."});
+Object.assign(L.ru,{'🏠 Жатақханаға өтініш беру':'🏠 Подать заявку на общежитие','Өтінім әкімшілікке түседі, шешім ашық ережелермен қабылданады, әр өзгеріс төменде тарихта көрінеді.':'Заявка поступает администрации, решение принимается по открытым правилам, каждое изменение видно ниже в истории.','Өтініш нөмірі':'Номер заявки','Әкімшілік түсіндірмесі:':'Пояснение администрации:','Мәртебе тарихы':'История статусов','Жіберілді':'Отправлено','Әкімшілік тексеруінде':'На проверке у администрации','Қосымша құжат қажет':'Нужен дополнительный документ','Комиссия қарауында':'На рассмотрении комиссии','Резервтік кезек':'Резервная очередь','Бас тартылды':'Отказано','Апелляцияда':'На апелляции','Студент':'Студент','Тұрғын үй':'Жильё','Әлеуметтік жағдай':'Социальное положение','Растау':'Подтверждение','Жаңа өтініш':'Новая заявка','Университет':'Университет','Факультет':'Факультет','Мамандығы':'Специальность','Курс':'Курс','Тұрақты мекенжай':'Постоянный адрес','Қай өңірден келгені':'Из какого региона приехали','Алматыда тұрғын үйіңіз бар ма?':'Есть ли у вас жильё в Алматы?','Жоқ':'Нет','Бар':'Есть','Иә':'Да','Жатақханаға мұқтаждық себебі (кемінде 10 таңба)':'Причина нужды в общежитии (не менее 10 символов)','Әлеуметтік санаттар (бар болса белгілеңіз)':'Социальные категории (отметьте, если есть)','Жетім студент':'Студент-сирота','Ата-анасының қамқорлығынсыз қалған студент':'Студент, оставшийся без попечения родителей','Мүгедектігі бар студент':'Студент с инвалидностью','Көпбалалы отбасынан шыққан студент':'Студент из многодетной семьи','Әлеуметтік көмек алатын отбасы':'Семья, получающая социальную помощь','Қандас мәртебесі':'Статус кандаса','Басқа заңды басымдық санаты':'Другая законная льготная категория','Санаттар кейін құжатпен расталады.':'Категории позже подтверждаются документами.','Мен дербес деректерімді өңдеуге келісім беремін':'Я даю согласие на обработку моих персональных данных','Мәліметтердің дұрыстығын растаймын':'Подтверждаю достоверность сведений','Өтінімді жіберу':'Отправить заявку','← Артқа':'← Назад','Әрі қарай →':'Далее →','🏠 Жатақхана өтініштерін басқару':'🏠 Управление заявками на общежитие','Қабылдау, резервтік кезек және бас тарту шешімін комиссия қабылдайды. Мәртебені негіздемесіз өзгертуге болмайды.':'Решения о принятии, резерве и отказе принимает комиссия. Менять статус без обоснования нельзя.','Телефон:':'Телефон:','Мекенжай:':'Адрес:','Өңір:':'Регион:','Тұрғын үйі бар:':'Есть жильё:','Себеп:':'Причина:','Санаттар:':'Категории:','Мәртебені өзгерту':'Изменить статус','Негіздеме (міндетті)':'Обоснование (обязательно)','Өтінімдер жоқ.':'Заявок нет.','Барлық жолдарды толтырыңыз (себеп кемінде 10 таңба)':'Заполните все поля (причина не менее 10 символов)','Келісім мен растауды белгілеңіз':'Отметьте согласие и подтверждение','Өтініш жіберілді':'Заявка отправлена','Негіздеме жазыңыз':'Укажите обоснование','Мәртебе өзгертілді':'Статус изменён','Студент туралы деректерді толтырыңыз':'Заполните данные о студенте','Телефон нөмірі қате':'Неверный номер телефона','Тұрғын үй жағдайын толтырыңыз (себебі кемінде 10 таңба)':'Заполните жилищные условия (причина не менее 10 символов)','Келісім мен растау қажет':'Нужны согласие и подтверждение','Сізде белсенді өтініш бар':'У вас уже есть активная заявка','Тым көп өтініш. Кейінірек қайталаңыз':'Слишком много заявок. Повторите позже','Өтінімді студент береді':'Заявку подаёт студент','Өтінім табылмады':'Заявка не найдена','Бұл мәртебені әкімші қоя алмайды (шешімді комиссия қабылдайды)':'Этот статус администратор поставить не может (решает комиссия)','Негіздеме жазыңыз (кемінде 5 таңба)':'Укажите обоснование (не менее 5 символов)','Мәртебе бұрынғыдай':'Статус не изменился'});
+Object.assign(L.en,{'🏠 Жатақханаға өтініш беру':'🏠 Apply for a dormitory','Өтінім әкімшілікке түседі, шешім ашық ережелермен қабылданады, әр өзгеріс төменде тарихта көрінеді.':'Your application goes to the administration, the decision follows open rules, and every change is visible below in the history.','Өтініш нөмірі':'Application number','Әкімшілік түсіндірмесі:':'Administration comment:','Мәртебе тарихы':'Status history','Жіберілді':'Submitted','Әкімшілік тексеруінде':'Under administration review','Қосымша құжат қажет':'Additional document required','Комиссия қарауында':'Under committee review','Резервтік кезек':'Reserve list','Бас тартылды':'Rejected','Апелляцияда':'Under appeal','Студент':'Student','Тұрғын үй':'Housing','Әлеуметтік жағдай':'Social status','Растау':'Confirmation','Жаңа өтініш':'New application','Университет':'University','Факультет':'Faculty','Мамандығы':'Major','Курс':'Year','Тұрақты мекенжай':'Permanent address','Қай өңірден келгені':'Region you come from','Алматыда тұрғын үйіңіз бар ма?':'Do you have housing in Almaty?','Жоқ':'No','Бар':'Yes','Иә':'Yes','Жатақханаға мұқтаждық себебі (кемінде 10 таңба)':'Reason you need a dormitory (at least 10 characters)','Әлеуметтік санаттар (бар болса белгілеңіз)':'Social categories (tick if applicable)','Жетім студент':'Orphaned student','Ата-анасының қамқорлығынсыз қалған студент':'Student without parental care','Мүгедектігі бар студент':'Student with a disability','Көпбалалы отбасынан шыққан студент':'Student from a large family','Әлеуметтік көмек алатын отбасы':'Family receiving social aid','Қандас мәртебесі':'Repatriate (Kandas) status','Басқа заңды басымдық санаты':'Other legal priority category','Санаттар кейін құжатпен расталады.':'Categories will later be confirmed with documents.','Мен дербес деректерімді өңдеуге келісім беремін':'I consent to the processing of my personal data','Мәліметтердің дұрыстығын растаймын':'I confirm the information is accurate','Өтінімді жіберу':'Submit application','← Артқа':'← Back','Әрі қарай →':'Next →','🏠 Жатақхана өтініштерін басқару':'🏠 Manage dormitory applications','Қабылдау, резервтік кезек және бас тарту шешімін комиссия қабылдайды. Мәртебені негіздемесіз өзгертуге болмайды.':'The committee decides on acceptance, reserve list and rejection. A status cannot be changed without a reason.','Телефон:':'Phone:','Мекенжай:':'Address:','Өңір:':'Region:','Тұрғын үйі бар:':'Has housing:','Себеп:':'Reason:','Санаттар:':'Categories:','Мәртебені өзгерту':'Change status','Негіздеме (міндетті)':'Reason (required)','Өтінімдер жоқ.':'No applications.','Барлық жолдарды толтырыңыз (себеп кемінде 10 таңба)':'Fill in all fields (reason at least 10 characters)','Келісім мен растауды белгілеңіз':'Tick the consent and confirmation','Өтініш жіберілді':'Application submitted','Негіздеме жазыңыз':'Enter a reason','Мәртебе өзгертілді':'Status changed','Студент туралы деректерді толтырыңыз':'Fill in the student details','Телефон нөмірі қате':'Invalid phone number','Тұрғын үй жағдайын толтырыңыз (себебі кемінде 10 таңба)':'Fill in housing details (reason at least 10 characters)','Келісім мен растау қажет':'Consent and confirmation are required','Сізде белсенді өтініш бар':'You already have an active application','Тым көп өтініш. Кейінірек қайталаңыз':'Too many applications. Try again later','Өтінімді студент береді':'Only students can apply','Өтінім табылмады':'Application not found','Бұл мәртебені әкімші қоя алмайды (шешімді комиссия қабылдайды)':'An administrator cannot set this status (the committee decides)','Негіздеме жазыңыз (кемінде 5 таңба)':'Enter a reason (at least 5 characters)','Мәртебе бұрынғыдай':'The status is unchanged'});
+Object.assign(L.ru,{'Ашықтық және қоғамдық бақылау':'Открытость и общественный контроль','Ашықтық':'Открытость','🔎 Ашықтық және қоғамдық бақылау':'🔎 Открытость и общественный контроль','Жатақхана орындарын бөлудің ашықтығын қамтамасыз ету үшін жалпы статистика жарияланады. ЖСН, телефон, мекенжай және әлеуметтік құжаттар ешқашан көрсетілмейді.':'Для обеспечения открытости распределения мест публикуется общая статистика. ИИН, телефоны, адреса и социальные документы никогда не показываются.','Бөлу критерийлері':'Критерии распределения','Комиссия бекіткен критерийлер мен жеке деректерден тазартылған хаттамалар осы жерде жарияланады.':'Критерии, утверждённые комиссией, и обезличенные протоколы публикуются здесь.','Жатақханаға өтініштер: ашық статистика':'Заявки на общежитие: открытая статистика','Тек жалпы сандар көрсетіледі. Студенттердің жеке деректері ешқашан жарияланбайды.':'Показываются только общие цифры. Личные данные студентов никогда не публикуются.','Жалпы өтініш саны':'Всего заявок','Қанағаттандырылған өтініштер':'Удовлетворённые заявки','Бас тартылған өтініштер':'Отклонённые заявки','Қарау үстінде':'На рассмотрении','Қабылданды':'Принято','Резерв':'Резерв','Бос орын':'Свободные места','Барлығы':'Все'});
+Object.assign(L.en,{'Ашықтық және қоғамдық бақылау':'Transparency and public oversight','Ашықтық':'Transparency','🔎 Ашықтық және қоғамдық бақылау':'🔎 Transparency and public oversight','Жатақхана орындарын бөлудің ашықтығын қамтамасыз ету үшін жалпы статистика жарияланады. ЖСН, телефон, мекенжай және әлеуметтік құжаттар ешқашан көрсетілмейді.':'General statistics are published to keep dormitory placement transparent. ID numbers, phones, addresses and social documents are never shown.','Бөлу критерийлері':'Allocation criteria','Комиссия бекіткен критерийлер мен жеке деректерден тазартылған хаттамалар осы жерде жарияланады.':'Criteria approved by the committee and anonymised minutes are published here.','Жатақханаға өтініштер: ашық статистика':'Dormitory applications: open statistics','Тек жалпы сандар көрсетіледі. Студенттердің жеке деректері ешқашан жарияланбайды.':"Only overall numbers are shown. Students' personal data is never published.",'Жалпы өтініш саны':'Total applications','Қанағаттандырылған өтініштер':'Approved applications','Бас тартылған өтініштер':'Rejected applications','Қарау үстінде':'In progress','Қабылданды':'Accepted','Резерв':'Reserve','Бос орын':'Free places','Барлығы':'All'});
+const P=[
+[/^📷 QR арқылы келдіңіз: (.+)$/,{ru:'📷 Вы пришли по QR: $1',en:'📷 You came via QR: $1'}],
+[/^Қош келдіңіз, (.+)$/,{ru:'Добро пожаловать, $1',en:'Welcome, $1'}],
+[/^Smart Dormitory • Сәлем, (.+)$/,{ru:'Smart Dormitory • Привет, $1',en:'Smart Dormitory • Hello, $1'}],
+[/^Студент өз ЖОО корпоративтік поштасымен тіркеледі: (.+)$/,{ru:'Студент регистрируется с корпоративной почтой вуза: $1',en:'Students sign up with their university email: $1'}]
+];
+
+P.push(
+[/^№(.+) бөлме$/,{ru:'Комната №$1',en:'Room №$1'}],
+[/^Менің өтінімдерім \((\d+)\)$/,{ru:'Мои заявки ($1)',en:'My requests ($1)'}],
+[/^Барлық өтінімдер \((\d+)\)$/,{ru:'Все заявки ($1)',en:'All requests ($1)'}],
+[/^📍 Ақау орнын картадан белгілеңіз \(сіздің GPS-тен ≤ (\d+) м\)$/,{ru:'📍 Отметьте место поломки на карте (не дальше $1 м от вашего GPS)',en:'📍 Mark the problem location on the map (within $1 m of your GPS)'}],
+[/^📍 Орныңыз анықталды \(±(\d+) м\)$/,{ru:'📍 Ваше местоположение определено (±$1 м)',en:'📍 Your location was found (±$1 m)'}],
+[/^✅ Нүкте сізден (\d+) м \(≤ (\d+) м\)\. Жіберуге болады • GPS ±(\d+) м$/,{ru:'✅ Точка в $1 м от вас (≤ $2 м). Можно отправлять • GPS ±$3 м',en:'✅ Point is $1 m from you (≤ $2 m). You can submit • GPS ±$3 m'}],
+[/^❌ Нүкте сізден (\d+) м алыс \(рұқсат (\d+) м\)\. Жіберу өшірілді$/,{ru:'❌ Точка дальше $1 м от вас (разрешено $2 м). Отправка отключена',en:'❌ Point is $1 m away (allowed $2 m). Submitting is disabled'}],
+[/^⚠️ Нүкте сізден (\d+) м алыс\. Рұқсат етілген радиус — (\d+) м$/,{ru:'⚠️ Точка дальше $1 м от вас. Допустимый радиус — $2 м',en:'⚠️ Point is $1 m away. Allowed radius is $2 m'}],
+[/^📨 Әкімшілікке хабар жіберілді: (.*)$/,{ru:'📨 Администрации отправлено уведомление: $1',en:'📨 Administration notified: $1'}],
+[/^⚠️ Хабар кетпеді: (.*)$/,{ru:'⚠️ Уведомление не отправлено: $1',en:'⚠️ Notification not sent: $1'}]
+);
+P.push(
+[/^🔳 Жатақхана QR-кодтары \((\d+)\)$/,{ru:'🔳 QR-коды общежитий ($1)',en:'🔳 Dormitory QR codes ($1)'}],
+[/^Өтінімдер кестесі \((\d+)\)$/,{ru:'Таблица заявок ($1)',en:'Requests table ($1)'}]
+);
+P.push(
+[/^Өтінім нүктесі сіздің GPS орныңыздан ≤ (\d+) м болуы және геолокацияға рұқсат берілуі керек$/,{ru:'Точка заявки должна быть не дальше $1 м от вашего GPS, и нужен доступ к геолокации',en:'The request point must be within $1 m of your GPS and location access must be allowed'}],
+[/^⚠️ Сервер бос жауап қайтарды \(HTTP (\d+)\)\.$/,{ru:'⚠️ Сервер вернул пустой ответ (HTTP $1).',en:'⚠️ The server returned an empty response (HTTP $1).'}],
+[/^⚠️ Сервер күтпеген жауап қайтарды \(HTTP (\d+)\)\.$/,{ru:'⚠️ Сервер вернул неожиданный ответ (HTTP $1).',en:'⚠️ The server returned an unexpected response (HTTP $1).'}],
+[/^⚠️ Серверге қосылу қатесі \((.*)\)\.$/,{ru:'⚠️ Ошибка подключения к серверу ($1).',en:'⚠️ Server connection error ($1).'}],
+[/^Сервер қатесі: (.*)$/,{ru:'Ошибка сервера: $1',en:'Server error: $1'}]
+);
+
+/* ЖОО, жатақхана, көше атаулары мен қосымша жолдар: бос орындарды толтырады (барлар өзгермейді) */
+(()=>{const add=(l,o)=>{for(const k in o)if(L[l][k]===undefined)L[l][k]=o[k]};add('ru',{"Осы ретінде кіру": "Войти как этот", "Шебер жіберу": "Отправить мастера", "Жатақханаға өтініш беру": "Подать заявку на общежитие", "Жатақхана": "Общежитие", "Жатақхана / университет туралы ақпарат (ережелер, жұмыс уақыты, құжаттар)": "Информация об общежитии / университете (правила, часы работы, документы)", "геолокация тексерілмейді": "геолокация не проверяется", "Браузер геолокацияны қолдамайды": "Браузер не поддерживает геолокацию", "Өтінім жіберу бұғатталды": "Отправка заявки заблокирована", "Геолокацияға рұқсат берілмеген (браузер баптауын және HTTPS-ті тексеріңіз)": "Доступ к геолокации не разрешён (проверьте настройки браузера и HTTPS)", "GPS сигналы жоқ, күте тұрыңыз…": "Нет сигнала GPS, подождите…", "Геолокацияға рұқсат сұралуда…": "Запрашивается доступ к геолокации…", "Әл-Фараби": "аль-Фараби", "Қазыбек би": "Казыбек би", "Уәлиханов": "Валиханова", "Төле би": "Толе би", "Сейфуллин": "Сейфуллина", "Жамбыл": "Жамбыла", "Әйтеке би": "Айтеке би", "Байтұрсынов": "Байтурсынова", "Сәтбаев": "Сатпаева", "Ладыгин": "Ладыгина", "Бөгенбай батыр": "Богенбай батыра", "Шевченко": "Шевченко", "Шағабутдинов": "Шагабутдинова", "Масанчи": "Масанчи", "Абай": "Абая", "Наурызбай батыр": "Наурызбай батыра", "Фуркат": "Фурката", "Әйтиев": "Айтиева", "Райымбек": "Райымбека", "Құрманғазы": "Курмангазы", "Мұратбаев": "Муратбаева", "Тұрғыт Өзал": "Тургута Озала", "Ислам Кәрімов": "Ислама Каримова", "Жандосов": "Жандосова", "10-шағын аудан": "10-й микрорайон", "Манас": "Манаса", "Пушкин": "Пушкина", "Розыбакиев": "Розыбакиева", "Панфилов": "Панфилова", "Қабанбай батыр": "Кабанбай батыра", "Абылай хан": "Абылай хана", "Гоголь": "Гоголя", "ҚБТУ (KBTU)": "КБТУ (KBTU)", "МУИТ (IITU)": "МУИТ (IITU)", "ҚазҰАЗУ": "КазНАИУ", "АТУ": "Алматинский технологический университет (АТУ)", "ҚазХҚжӘТУ (Абылай хан)": "КазУМОиМЯ имени Абылай хана", "Нұр-Мүбарак": "Нур-Мубарак", "Нархоз": "Нархоз", "KIMEP": "KIMEP", "Тұран": "Туран", "DKU (Қазақ-Неміс)": "DKU (Казахстанско-Немецкий)", "АЭжБУ (Energo)": "АУЭС (Energo)", "QyzPU (Қыздар пед.)": "QyzPU (Женский пед.)", "ALT (ҚазККА)": "ALT (КазАТК)", "ЕТУ": "ЕТУ", "AlmaU": "AlmaU", "Т. Жүргенов Өнер академиясы": "Академия искусств имени Т. Жургенова", "ҚазСТА (Спорт академиясы)": "КазАСТ (Академия спорта)", "Құрманғазы Консерваториясы": "Консерватория имени Курмангазы", "SDU University": "SDU University", "№1 Студенттер үйі": "№1 Студенческий дом", "№2 Студенттер үйі": "№2 Студенческий дом", "№4 Студенттер үйі": "№4 Студенческий дом", "№5 Студенттер үйі": "№5 Студенческий дом", "№6 Студенттер үйі": "№6 Студенческий дом", "№7 Студенттер үйі": "№7 Студенческий дом", "№8 Студенттер үйі": "№8 Студенческий дом", "№9 Студенттер үйі": "№9 Студенческий дом", "№10 Студенттер үйі": "№10 Студенческий дом", "№13 Студенттер үйі": "№13 Студенческий дом", "№14 Студенттер үйі": "№14 Студенческий дом", "№15 Студенттер үйі": "№15 Студенческий дом", "№16 Студенттер үйі": "№16 Студенческий дом", "№17 Студенттер үйі": "№17 Студенческий дом", "№18 Жас ғалымдар үйі": "№18 Дом молодых учёных", "№1 Жатақхана": "№1 Общежитие", "№2 Жатақхана": "№2 Общежитие", "№3 Жатақхана": "№3 Общежитие", "№5 Жатақхана": "№5 Общежитие", "№8 Жатақхана": "№8 Общежитие", "№4 Жатақхана": "№4 Общежитие", "№6 МЖК": "№6 МЖК", "№6 Жатақхана": "№6 Общежитие", "№7 Жатақхана": "№7 Общежитие", "№9 Жатақхана": "№9 Общежитие", "№10 Жатақхана": "№10 Общежитие", "№1 Студенттер үйі (ерлер)": "№1 Студенческий дом (мужской)", "№2 Студенттер үйі (қыздар)": "№2 Студенческий дом (женский)", "Jastar City": "Jastar City", "Магистранттар жатақханасы": "Общежитие магистрантов", "KIMEP Dormitory": "KIMEP Dormitory", "Студенттер үйі": "Студенческий дом", "№1, №2, №3 Жатақханалар": "№1, №2, №3 Общежития", "№3 Жатақханалар": "№3 Общежития", "№1–№7 Студенттер үйлері": "№1–№7 Студенческие дома", "Студенттер үйлері": "Студенческие дома"});add('en',{"Осы ретінде кіру": "Log in as this", "Шебер жіберу": "Send technician", "Жатақханаға өтініш беру": "Apply for a dormitory", "Жатақхана": "Dormitory", "Жатақхана / университет туралы ақпарат (ережелер, жұмыс уақыты, құжаттар)": "Dormitory / university information (rules, working hours, documents)", "геолокация тексерілмейді": "geolocation is not checked", "Браузер геолокацияны қолдамайды": "The browser does not support geolocation", "Өтінім жіберу бұғатталды": "Submitting is blocked", "Геолокацияға рұқсат берілмеген (браузер баптауын және HTTPS-ті тексеріңіз)": "Location access denied (check browser settings and HTTPS)", "GPS сигналы жоқ, күте тұрыңыз…": "No GPS signal, please wait…", "Геолокацияға рұқсат сұралуда…": "Requesting location access…", "Әл-Фараби": "Al-Farabi", "Қазыбек би": "Kazybek Bi", "Уәлиханов": "Valikhanov", "Төле би": "Tole Bi", "Сейфуллин": "Seifullin", "Жамбыл": "Zhambyl", "Әйтеке би": "Aiteke Bi", "Байтұрсынов": "Baitursynov", "Сәтбаев": "Satpayev", "Ладыгин": "Ladygin", "Бөгенбай батыр": "Bogenbai Batyr", "Шевченко": "Shevchenko", "Шағабутдинов": "Shagabutdinov", "Масанчи": "Masanchi", "Абай": "Abai", "Наурызбай батыр": "Nauryzbai Batyr", "Фуркат": "Furkat", "Әйтиев": "Aitiev", "Райымбек": "Raiymbek", "Құрманғазы": "Kurmangazy", "Мұратбаев": "Muratbayev", "Тұрғыт Өзал": "Turgut Ozal", "Ислам Кәрімов": "Islam Karimov", "Жандосов": "Zhandosov", "10-шағын аудан": "Microdistrict 10", "Манас": "Manas", "Пушкин": "Pushkin", "Розыбакиев": "Rozybakiyev", "Панфилов": "Panfilov", "Қабанбай батыр": "Kabanbai Batyr", "Абылай хан": "Abylai Khan", "Гоголь": "Gogol", "ҚБТУ (KBTU)": "KBTU", "МУИТ (IITU)": "IITU", "ҚазҰАЗУ": "KazNARU", "АТУ": "Almaty Technological University (ATU)", "ҚазХҚжӘТУ (Абылай хан)": "Ablai Khan KazUIRWL", "Нұр-Мүбарак": "Nur-Mubarak", "Нархоз": "Narxoz", "KIMEP": "KIMEP", "Тұран": "Turan", "DKU (Қазақ-Неміс)": "DKU (Kazakh-German)", "АЭжБУ (Energo)": "AUES (Energo)", "QyzPU (Қыздар пед.)": "QyzPU (Women's Pedagogical)", "ALT (ҚазККА)": "ALT (KazATC)", "ЕТУ": "ETU", "AlmaU": "AlmaU", "Т. Жүргенов Өнер академиясы": "T. Zhurgenov Academy of Arts", "ҚазСТА (Спорт академиясы)": "KazSTA (Sports Academy)", "Құрманғазы Консерваториясы": "Kurmangazy Conservatory", "SDU University": "SDU University", "№1 Студенттер үйі": "№1 Student House", "№2 Студенттер үйі": "№2 Student House", "№4 Студенттер үйі": "№4 Student House", "№5 Студенттер үйі": "№5 Student House", "№6 Студенттер үйі": "№6 Student House", "№7 Студенттер үйі": "№7 Student House", "№8 Студенттер үйі": "№8 Student House", "№9 Студенттер үйі": "№9 Student House", "№10 Студенттер үйі": "№10 Student House", "№13 Студенттер үйі": "№13 Student House", "№14 Студенттер үйі": "№14 Student House", "№15 Студенттер үйі": "№15 Student House", "№16 Студенттер үйі": "№16 Student House", "№17 Студенттер үйі": "№17 Student House", "№18 Жас ғалымдар үйі": "№18 Young Scientists House", "№1 Жатақхана": "№1 Dormitory", "№2 Жатақхана": "№2 Dormitory", "№3 Жатақхана": "№3 Dormitory", "№5 Жатақхана": "№5 Dormitory", "№8 Жатақхана": "№8 Dormitory", "№4 Жатақхана": "№4 Dormitory", "№6 МЖК": "№6 МЖК", "№6 Жатақхана": "№6 Dormitory", "№7 Жатақхана": "№7 Dormitory", "№9 Жатақхана": "№9 Dormitory", "№10 Жатақхана": "№10 Dormitory", "№1 Студенттер үйі (ерлер)": "№1 Student House (men)", "№2 Студенттер үйі (қыздар)": "№2 Student House (women)", "Jastar City": "Jastar City", "Магистранттар жатақханасы": "Master's Dormitory", "KIMEP Dormitory": "KIMEP Dormitory", "Студенттер үйі": "Student House", "№1, №2, №3 Жатақханалар": "№1, №2, №3 Dormitories", "№3 Жатақханалар": "№3 Dormitories", "№1–№7 Студенттер үйлері": "№1–№7 Student Houses", "Студенттер үйлері": "Student Houses"})})();
+P.push(
+[/^Ақау орнын картадан белгілеңіз \(сіздің GPS-тен ≤ (\d+) м\)$/,{ru:'Отметьте место неисправности на карте (не дальше $1 м от вашего GPS)',en:'Mark the fault location on the map (within $1 m of your GPS)'}],
+[/^Нүкте сізден (\d+) м \(≤ (\d+) м\)\. Жіберуге болады • GPS ±(\d+) м$/,{ru:'Точка в $1 м от вас (≤ $2 м). Можно отправлять • GPS ±$3 м',en:'The point is $1 m from you (≤ $2 m). You can submit • GPS ±$3 m'}],
+[/^Нүкте сізден (\d+) м алыс \(рұқсат (\d+) м\)\. Жіберу өшірілді$/,{ru:'Точка слишком далеко: $1 м (разрешено $2 м). Отправка отключена',en:'The point is $1 m away (allowed $2 m). Submitting is disabled'}],
+[/^Нүкте сізден (\d+) м алыс\. Рұқсат етілген радиус — (\d+) м$/,{ru:'Точка в $1 м от вас. Допустимый радиус: $2 м',en:'The point is $1 m from you. Allowed radius: $2 m'}],
+[/^Орныңыз анықталды \(±(\d+) м\)$/,{ru:'Ваше местоположение определено (±$1 м)',en:'Your location is detected (±$1 m)'}],
+[/^Жатақхана QR-кодтары \((\d+)\)$/,{ru:'QR-коды общежитий ($1)',en:'Dormitory QR codes ($1)'}],
+[/^Браузер геолокацияны қолдамайды\. Өтінім жіберу бұғатталды$/,{ru:'Браузер не поддерживает геолокацию. Отправка заявки заблокирована',en:'The browser does not support geolocation. Submitting is blocked'}],
+[/^Геолокацияға рұқсат берілмеген \((.*)\)\. Өтінім жіберу бұғатталды$/,{ru:'Доступ к геолокации не разрешён ($1). Отправка заявки заблокирована',en:'Location access denied ($1). Submitting is blocked'}]
+);
+/* Эмодзи белгісі иконкаға ауысқанда мәтін эмодзисіз қалады: эмодзисіз нұсқаларды да аударма кілті ретінде қосамыз */
+for(const l of ['ru','en']){const D=L[l],E=/^[\p{Extended_Pictographic}\uFE0F\u200D\s]+/u;for(const k of Object.keys(D)){const m=k.match(E);if(!m)continue;const s=k.slice(m[0].length);if(s&&D[s]===undefined)D[s]=String(D[k]).replace(E,'')}}
+let lang=localStorage.getItem('cc_lang')||'kk';
+const t1=k=>{let v=L[lang][k];if(v!==undefined)return v;
+ for(const [re,m] of P){if(re.test(k))return k.replace(re,m[lang])}
+ let q=k.match(/^(\S+)\s+([^\s].*)$/);if(q&&L[lang][q[2]]!==undefined)return q[1]+' '+L[lang][q[2]];
+ if(/[,:.]$/.test(k)){const w=t1(k.slice(0,-1));if(w!==undefined)return w+k.slice(-1)}
+ {const c=k.match(/^(.*\S) \((\d+)\)$/);if(c){const w=t1(c[1]);if(w!==undefined)return w+' ('+c[2]+')'}}
+ return undefined};
+const t2=k=>{let v=t1(k);if(v!==undefined)return v;
+ const parts=k.split(/( • |: |, | — | \| | \/ )/);if(parts.length<3)return undefined;let hit=0;
+ const o=parts.map((x,i)=>{if(i%2)return x;const w=t1(x.trim());if(w!==undefined){hit++;return x.replace(x.trim(),()=>w)}return x});
+ return hit?o.join(''):undefined};
+const tr=s=>{if(lang==='kk')return null;const k=s.trim();if(!k)return null;const v=t2(k);return v===undefined?null:s.replace(k,()=>v)};
+const IC={"home": "<path d=\"M3 10.5 12 3l9 7.5\"/><path d=\"M5 9.5V21h14V9.5\"/><path d=\"M9.5 21v-6h5v6\"/>", "search": "<circle cx=\"11\" cy=\"11\" r=\"7\"/><path d=\"m20 20-3.5-3.5\"/>", "shield": "<path d=\"M12 3 4 6v6c0 4.5 3.2 7.8 8 9 4.8-1.2 8-4.5 8-9V6l-8-3z\"/><path d=\"m9 12 2 2 4-4\"/>", "edit": "<path d=\"M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z\"/><path d=\"M14 3v5h5M9 13h6M9 17h4\"/>", "map": "<path d=\"M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z\"/><path d=\"M9 4v14M15 6v14\"/>", "chart": "<path d=\"M4 20V11M10 20V4M16 20v-6M22 20H2\"/>", "sos": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><circle cx=\"12\" cy=\"12\" r=\"3.5\"/><path d=\"m5.6 5.6 3.9 3.9M14.5 14.5l3.9 3.9M18.4 5.6l-3.9 3.9M9.5 14.5l-3.9 3.9\"/>", "code": "<path d=\"m8 8-4 4 4 4M16 8l4 4-4 4M14 5l-4 14\"/>", "pin": "<path d=\"M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z\"/><circle cx=\"12\" cy=\"9.5\" r=\"2.5\"/>", "camera": "<path d=\"M4 8h3l2-3h6l2 3h3v11H4z\"/><circle cx=\"12\" cy=\"13\" r=\"3.5\"/>", "inbox": "<path d=\"M4 13 6 5h12l2 8\"/><path d=\"M4 13v6h16v-6h-5l-1 2h-4l-1-2z\"/>", "key": "<circle cx=\"8\" cy=\"15\" r=\"4\"/><path d=\"m11 12 9-9M16 7l3 3\"/>", "qr": "<rect x=\"4\" y=\"4\" width=\"6\" height=\"6\" rx=\"1\"/><rect x=\"14\" y=\"4\" width=\"6\" height=\"6\" rx=\"1\"/><rect x=\"4\" y=\"14\" width=\"6\" height=\"6\" rx=\"1\"/><path d=\"M14 14h2v2h-2zM18 14h2v6h-4M14 18h2\"/>", "clip": "<rect x=\"6\" y=\"4\" width=\"12\" height=\"17\" rx=\"2\"/><path d=\"M9 4h6v3H9zM9 12h6M9 16h4\"/>", "clock": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 7v5l3 2\"/>", "flame": "<path d=\"M12 3c1 4 5 5.5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-4-1-6 1-9z\"/>", "id": "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"/><circle cx=\"9\" cy=\"11\" r=\"2\"/><path d=\"M6 16c.5-1.5 1.8-2 3-2s2.5.5 3 2M15 10h3M15 14h3\"/>", "school": "<path d=\"M4 21V8l8-5 8 5v13\"/><path d=\"M9 21v-5h6v5M9 11h.01M15 11h.01\"/>", "door": "<path d=\"M6 21V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v17M4 21h16\"/><circle cx=\"14.5\" cy=\"12.5\" r=\".8\"/>", "drop": "<path d=\"M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z\"/>", "bolt": "<path d=\"M13 3 5 13h6l-1 8 8-10h-6z\"/>", "chair": "<path d=\"M7 4h10v7H7zM6 11h12v3H6zM8 14v6M16 14v6\"/>", "thermo": "<path d=\"M10 14V5a2 2 0 1 1 4 0v9a4 4 0 1 1-4 0z\"/>", "wrench": "<path d=\"M14.7 6.3a4 4 0 0 0 5 5L10.3 20.7a2.1 2.1 0 0 1-3-3z\"/>", "mail": "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"/><path d=\"m3 7 9 6 9-6\"/>", "down": "<path d=\"M12 4v11m0 0 4-4m-4 4-4-4M5 20h14\"/>", "refresh": "<path d=\"M4 12a8 8 0 0 1 14-5l2 2M20 4v5h-5M20 12a8 8 0 0 1-14 5l-2-2M4 20v-5h5\"/>", "trash": "<path d=\"M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3\"/>", "user": "<circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21c1-4 4-6 8-6s7 2 8 6\"/>", "check": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"m8 12 3 3 5-6\"/>", "alert": "<path d=\"M12 3 2 20h20z\"/><path d=\"M12 10v5M12 18h.01\"/>", "bell": "<path d=\"M6 17v-6a6 6 0 0 1 12 0v6l2 2H4zM10 21h4\"/>", "globe": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18\"/>"};
+const EM={"🏠": "home", "🔎": "search", "🛡": "shield", "📝": "edit", "🗺": "map", "📊": "chart", "🆘": "sos", "🧑‍💻": "code", "📍": "pin", "📷": "camera", "📥": "inbox", "🔑": "key", "🔳": "qr", "📋": "clip", "🕒": "clock", "🔥": "flame", "🪪": "id", "🆔": "id", "🏫": "school", "🎓": "school", "🚪": "door", "🚰": "drop", "⚡": "bolt", "🪑": "chair", "🌡": "thermo", "🛠": "wrench", "📨": "mail", "⬇": "down", "♻": "refresh", "🗑": "trash", "👤": "user", "✅": "check", "⚠": "alert", "🚫": "alert", "❌": "alert", "🔔": "bell", "📡": "pin", "⏳": "clock"},DOT={"🔴": "#ef4444", "🟢": "#10b981", "🔵": "#3b82f6"};
+const svgI=n=>`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${IC[n]||''}</svg>`;
+const EMRE=new RegExp('('+Object.keys(EM).concat(Object.keys(DOT)).sort((a,b)=>b.length-a.length).join('|')+')\\uFE0F?','g');
+function ico(n){const t=n.nodeValue;EMRE.lastIndex=0;if(!EMRE.test(t))return;EMRE.lastIndex=0;
+ if(n.parentNode&&n.parentNode.nodeName==='OPTION'){n.nodeValue=t.replace(EMRE,'').replace(/^\s+/,'');return}
+ const f=document.createDocumentFragment();let last=0,m;
+ while((m=EMRE.exec(t))){if(m.index>last)f.appendChild(document.createTextNode(t.slice(last,m.index)));
+  const sp=document.createElement('span');sp.className='ics';
+  if(DOT[m[1]])sp.innerHTML='<i class="dot" style="background:'+DOT[m[1]]+'"></i>';else sp.innerHTML=svgI(EM[m[1]]);
+  f.appendChild(sp);last=m.index+m[0].length}
+ if(last<t.length)f.appendChild(document.createTextNode(t.slice(last)));n.replaceWith(f)}
+const SKIP={SCRIPT:1,STYLE:1,TEXTAREA:1};
+function walk(n){
+ if(n.nodeType===3){const v=tr(n.nodeValue);if(v!==null&&v!==n.nodeValue)n.nodeValue=v;ico(n);return}
+ if(n.nodeType!==1||SKIP[n.tagName]||n.hasAttribute('data-notr')||(n.classList&&n.classList.contains('ics')))return;
+ for(const a of ['placeholder','title','aria-label','alt']){if(n.hasAttribute(a)){const v=tr(n.getAttribute(a));if(v!==null)n.setAttribute(a,v)}}
+ Array.from(n.childNodes).forEach(walk)}
+document.documentElement.lang=lang;
+new MutationObserver(ms=>{for(const m of ms)m.addedNodes.forEach(walk)}).observe(document.documentElement,{childList:true,subtree:true});
+document.addEventListener('DOMContentLoaded',()=>{
+ walk(document.body);
+ {const rn=document.getElementById('rn');if(rn){const v=tr(rn.value);if(v!==null)rn.value=v}}
+ const d=document.createElement('div');d.setAttribute('data-notr','1');d.className='langw';
+ const names={kk:'ҚАЗ',ru:'РУС',en:'ENG'};
+ d.innerHTML='<div class="langm" hidden></div><button type="button" class="langb">'+svgI('globe')+'<span>'+names[lang]+'</span></button>';
+ const m=d.querySelector('.langm'),bt=d.querySelector('.langb');
+ Object.keys(names).forEach(k=>{const b=document.createElement('button');b.type='button';b.textContent=names[k];if(k===lang)b.className='on';b.onclick=()=>{if(k!==lang){localStorage.setItem('cc_lang',k);location.reload()}else m.hidden=true};m.appendChild(b)});
+ bt.onclick=()=>{m.hidden=!m.hidden};
+ document.addEventListener('click',e=>{if(!d.contains(e.target))m.hidden=true});
+ document.body.appendChild(d)});
+})();
+</script>
+<script>
+const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
+const LS=(k,v)=>v===undefined?JSON.parse(localStorage.getItem(k)||'null'):localStorage.setItem(k,JSON.stringify(v));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const YMAPS_KEY='F463c671-b736-4488-9664-37adf83b4014'; // Yandex Maps JS API 2.1 кілті (бос болса немесе жүктелмесе, Leaflet картасы жұмыс істейді)
+const GEO_REQUIRED=true,GEO_RADIUS=20; // GEO_REQUIRED=true: GPS рұқсатысыз өтінім жіберілмейді; белгіленген нүкте пайдаланушының GPS-інен GEO_RADIUS метрден аспауы керек (әзірлеуші үшін тексерілмейді)
+const AI_URL='https://ortak-ai.1999versace1999.workers.dev'; // ЖИ прокси (Cloudflare Worker) адресі, мысалы https://ortaq-ai.аккаунт.workers.dev. Gemini кілтін БҰЛ ФАЙЛҒА ЖАЗБАҢЫЗ
+const DORMS={
+ "kaznu":{"n":"Әл-Фараби атындағы ҚазҰУ","a":"Әл-Фараби, 71/1","p":[43.2225,76.9228],"dom":"kaznu.kz","ds":[{"id":"kaznu-1","n":"№1 Студенттер үйі","a":"Әл-Фараби, 71/1"},{"id":"kaznu-2","n":"№2 Студенттер үйі","a":"Әл-Фараби, 71/2"},{"id":"kaznu-3","n":"№4 Студенттер үйі","a":"Әл-Фараби, 71/4"},{"id":"kaznu-4","n":"№5 Студенттер үйі","a":"Әл-Фараби, 71/5"},{"id":"kaznu-5","n":"№6 Студенттер үйі","a":"Әл-Фараби, 71/6"},{"id":"kaznu-6","n":"№7 Студенттер үйі","a":"Әл-Фараби, 71/7"},{"id":"kaznu-7","n":"№8 Студенттер үйі","a":"Әл-Фараби, 71/8"},{"id":"kaznu-8","n":"№9 Студенттер үйі","a":"Әл-Фараби, 71/9"},{"id":"kaznu-9","n":"№10 Студенттер үйі","a":"Әл-Фараби, 71/10"},{"id":"kaznu-10","n":"№13 Студенттер үйі","a":"Әл-Фараби, 71/13"},{"id":"kaznu-11","n":"№14 Студенттер үйі","a":"Әл-Фараби, 71/14"},{"id":"kaznu-12","n":"№15 Студенттер үйі","a":"Әл-Фараби, 71/15"},{"id":"kaznu-13","n":"№16 Студенттер үйі","a":"Әл-Фараби, 71/16"},{"id":"kaznu-14","n":"№17 Студенттер үйі","a":"Әл-Фараби, 71/17"},{"id":"kaznu-15","n":"№18 Жас ғалымдар үйі","a":"Әл-Фараби, 71/18"}]},
+ "kaznpu":{"n":"Абай атындағы ҚазҰПУ","a":"Қазыбек би, 30 / Уәлиханов, 64","p":[43.2528,76.9532],"dom":"kaznpu.kz","ds":[{"id":"kaznpu-1","n":"№1 Жатақхана","a":"Қазыбек би, 30 / Уәлиханов, 64"},{"id":"kaznpu-2","n":"№2 Жатақхана","a":"Төле би, 86"},{"id":"kaznpu-3","n":"№3 Жатақхана","a":"Сейфуллин, 533 / Қазыбек би, 117"},{"id":"kaznpu-4","n":"№5 Жатақхана","a":"Жамбыл, 25"},{"id":"kaznpu-5","n":"№8 Жатақхана","a":"Әйтеке би, 31"}]},
+ "satbayev":{"n":"Satbayev University","a":"Сейфуллин, 563","p":[43.2369,76.9315],"dom":"satbayev.university","ds":[{"id":"satbayev-1","n":"№1 Жатақхана","a":"Сейфуллин, 563"},{"id":"satbayev-2","n":"№2 Жатақхана","a":"Байтұрсынов, 126/1"},{"id":"satbayev-3","n":"№3 Жатақхана","a":"Байтұрсынов, 126/2"},{"id":"satbayev-4","n":"№4 Жатақхана","a":"Сәтбаев, 22г"},{"id":"satbayev-5","n":"№5 Жатақхана","a":"Сәтбаев, 22д"},{"id":"satbayev-6","n":"№6 МЖК","a":"Ладыгин, 34"}]},
+ "kaznmu":{"n":"С.Ж. Асфендияров атындағы ҚазҰМУ","a":"Бөгенбай батыр, 151","p":[43.2529,76.9242],"dom":"kaznmu.kz","ds":[{"id":"kaznmu-1","n":"№1 Жатақхана","a":"Бөгенбай батыр, 151"},{"id":"kaznmu-2","n":"№2 Жатақхана","a":"Бөгенбай батыр, 153"},{"id":"kaznmu-3","n":"№3 Жатақхана","a":"Төле би, 92"},{"id":"kaznmu-4","n":"№4 Жатақхана","a":"Шевченко, 126"},{"id":"kaznmu-5","n":"№5 Жатақхана","a":"Шағабутдинов, 132"},{"id":"kaznmu-6","n":"№6 Жатақхана","a":"Масанчи, 38"},{"id":"kaznmu-7","n":"№7 Жатақхана","a":"Бөгенбай батыр, 155"}]},
+ "kaznaru":{"n":"ҚазҰАЗУ","a":"Абай, 24","p":[43.238,76.945],"dom":"","ds":[{"id":"kaznaru-1","n":"№1 Жатақхана","a":"Абай, 24"},{"id":"kaznaru-2","n":"№2 Жатақхана","a":"Абай, 26"},{"id":"kaznaru-3","n":"№3 Жатақхана","a":"Сәтбаев, 12"},{"id":"kaznaru-4","n":"№5 Жатақхана","a":"Сәтбаев, 14"},{"id":"kaznaru-5","n":"№7 Жатақхана","a":"Наурызбай батыр, 125"},{"id":"kaznaru-6","n":"№8 Жатақхана","a":"Сейфуллин, 597"},{"id":"kaznaru-7","n":"№9 Жатақхана","a":"Абай, 28"},{"id":"kaznaru-8","n":"№10 Жатақхана","a":"Абай, 30"}]},
+ "atu":{"n":"АТУ","a":"Төле би, 100","p":[43.238,76.945],"dom":"","ds":[{"id":"atu-1","n":"№1 Жатақхана","a":"Төле би, 100"},{"id":"atu-2","n":"№2 Жатақхана","a":"Фуркат, 348/4"},{"id":"atu-3","n":"№3 Жатақхана","a":"Төле би, 100а"},{"id":"atu-4","n":"№4 Жатақхана","a":"Әйтиев, 96"},{"id":"atu-5","n":"№5 Студенттер үйі","a":"Райымбек, 348/5"}]},
+ "ablaikhan":{"n":"ҚазХҚжӘТУ (Абылай хан)","a":"Төле би, 84","p":[43.238,76.945],"dom":"","ds":[{"id":"ablaikhan-1","n":"№1 Жатақхана","a":"Төле би, 84"},{"id":"ablaikhan-2","n":"№2 Жатақхана","a":"Құрманғазы, 107"},{"id":"ablaikhan-3","n":"№3 Жатақхана","a":"Мұратбаев, 200"}]},
+ "nurmubarak":{"n":"Нұр-Мүбарак","a":"Әл-Фараби, 73/1","p":[43.238,76.945],"dom":"","ds":[{"id":"nurmubarak-1","n":"№1 Студенттер үйі (ерлер)","a":"Әл-Фараби, 73/1"},{"id":"nurmubarak-2","n":"№2 Студенттер үйі (қыздар)","a":"Әл-Фараби, 73/2"}]},
+ "kbtu":{"n":"ҚБТУ (KBTU)","a":"Тұрғыт Өзал, 70","p":[43.2435,76.8985],"dom":"kbtu.kz","ds":[{"id":"kbtu-1","n":"Jastar City","a":"Тұрғыт Өзал, 70"},{"id":"kbtu-2","n":"Магистранттар жатақханасы","a":"Ислам Кәрімов, 70"}]},
+ "narxoz":{"n":"Нархоз","a":"Жандосов, 55/1","p":[43.238,76.945],"dom":"","ds":[{"id":"narxoz-1","n":"№1 Жатақхана","a":"Жандосов, 55/1"},{"id":"narxoz-2","n":"№2 Жатақхана","a":"Жандосов, 55/2"},{"id":"narxoz-3","n":"№3 Жатақхана","a":"10-шағын аудан, 22а"}]},
+ "kimep":{"n":"KIMEP","a":"Абай, 2а","p":[43.238,76.945],"dom":"","ds":[{"id":"kimep-1","n":"KIMEP Dormitory","a":"Абай, 2а"}]},
+ "iitu":{"n":"МУИТ (IITU)","a":"Манас, 34/1 / Жандосов, 60","p":[43.2351,76.9097],"dom":"iitu.edu.kz","ds":[{"id":"iitu-1","n":"Студенттер үйі","a":"Манас, 34/1 / Жандосов, 60"}]},
+ "turan":{"n":"Тұран","a":"Сәтбаев, 16-18","p":[43.238,76.945],"dom":"","ds":[{"id":"turan-1","n":"Студенттер үйі","a":"Сәтбаев, 16-18"}]},
+ "dku":{"n":"DKU (Қазақ-Неміс)","a":"Пушкин, 111","p":[43.238,76.945],"dom":"","ds":[{"id":"dku-1","n":"Жатақхана","a":"Пушкин, 111"}]},
+ "aues":{"n":"АЭжБУ (Energo)","a":"Байтұрсынов, 126","p":[43.238,76.945],"dom":"","ds":[{"id":"aues-1","n":"№1, №2, №3 Жатақханалар","a":"Байтұрсынов, 126"}]},
+ "qyzpu":{"n":"QyzPU (Қыздар пед.)","a":"Әйтеке би, 99 / Гоголь, 114","p":[43.238,76.945],"dom":"","ds":[{"id":"qyzpu-1","n":"№1–№7 Студенттер үйлері","a":"Әйтеке би, 99 / Гоголь, 114"}]},
+ "alt":{"n":"ALT (ҚазККА)","a":"Шевченко, 97 / Масанчи, 88","p":[43.238,76.945],"dom":"","ds":[{"id":"alt-1","n":"Студенттер үйлері","a":"Шевченко, 97 / Масанчи, 88"}]},
+ "etu":{"n":"ЕТУ","a":"Төле би, 109б","p":[43.238,76.945],"dom":"","ds":[{"id":"etu-1","n":"Жатақхана","a":"Төле би, 109б"}]},
+ "almau":{"n":"AlmaU","a":"Розыбакиев, 227","p":[43.238,76.945],"dom":"","ds":[{"id":"almau-1","n":"Студенттер үйі","a":"Розыбакиев, 227"}]},
+ "zhurgenov":{"n":"Т. Жүргенов Өнер академиясы","a":"Панфилов, 127 / Қабанбай батыр, 134","p":[43.238,76.945],"dom":"","ds":[{"id":"zhurgenov-1","n":"Студенттер үйі","a":"Панфилов, 127 / Қабанбай батыр, 134"}]},
+ "kazsta":{"n":"ҚазСТА (Спорт академиясы)","a":"Абай, 83 / Байтұрсынов, 105","p":[43.238,76.945],"dom":"","ds":[{"id":"kazsta-1","n":"Студенттер үйлері","a":"Абай, 83 / Байтұрсынов, 105"}]},
+ "kurmangazy":{"n":"Құрманғазы Консерваториясы","a":"Абылай хан, 90 / Шевченко, 95","p":[43.238,76.945],"dom":"","ds":[{"id":"kurmangazy-1","n":"Студенттер үйі","a":"Абылай хан, 90 / Шевченко, 95"}]},
+ "sdu":{"n":"SDU University","a":"Абылай хан көш., 1/1, Қаскелең","p":[43.2078,76.6698],"dom":"sdu.edu.kz","ds":[{"id":"sdu-1","n":"Жатақхана","a":"Абылай хан көш., 1/1, Қаскелең"}]}};
+const ALM=[43.238,76.945]; // координатасы дәл емес ЖОО-лардың картасы осы нүктеден ашылады
+const dormsOf=k=>(DORMS[k]&&DORMS[k].ds)||[];
+const myDid=k=>{let v='';try{v=localStorage.getItem('cc_dormid')||''}catch(e){}return dormsOf(k).some(d=>d.id===v)?v:((dormsOf(k)[0]||{}).id||'')};
+const dormName=(k,id)=>{const d=dormsOf(k).find(x=>x.id===id);return d?d.n:''};
+const dormAddr=(k,id)=>{const d=dormsOf(k).find(x=>x.id===id);return d?d.a:''};
+const dormOpts2=(k,sel)=>dormsOf(k).map(d=>`<option value="${d.id}"${d.id===sel?' selected':''}>${d.n} — ${d.a}</option>`).join('');
+const saveDid=id=>{try{if(id)localStorage.setItem('cc_dormid',id)}catch(e){}};
+
+// Әкімшілік пен әзірлеуші байланысын осында жазсаңыз, ол БАРЛЫҚ құрылғыда көрінеді
+const CONTACTS=Object.fromEntries(['dev',...Object.keys(DORMS)].map(k=>[k,{name:'',phone:'',email:''}]));
+CONTACTS.dev.name='Сейдаканов Абиль';
+
+/* ---------- әр ЖОО-ға жеке QR (?uni=kaznpu) ---------- */
+const SITE_URL=''; // сайтты хостингке жүктегесін: толық адресін осында жазыңыз, мысалы 'https://ortaq.kz/'. Бос болса, ағымдағы бет адресі алынады
+const UNI=(()=>{try{const u=(new URLSearchParams(location.search).get('uni')||'').toLowerCase();return DORMS[u]?u:''}catch(e){return ''}})();
+/* Студенттер кіргеннен кейін жаңа дашбордқа (dashboard.html) өтеді. ?full=1 болса, осы толық платформа ашылады */
+const FULL=/[?&]full=1\b/.test(location.search),DASH='dashboard.html';
+const uniUrl=k=>(SITE_URL||location.href.split(/[?#]/)[0])+'?uni='+k;
+const qrObj=k=>{if(typeof qrcode==='undefined')return null;const q=qrcode(0,'M');q.addData(uniUrl(k));q.make();return q};
+const qrSvg=k=>{const q=qrObj(k);return q?q.createSvgTag({cellSize:4,margin:2,scalable:true}):'<div class="text-xs text-red-600 p-2">QR кітапханасы жүктелмеді</div>'};
+function qrDl(k,t){
+ if(t==='link'){const u=uniUrl(k);if(navigator.clipboard)navigator.clipboard.writeText(u).then(()=>toast('Сілтеме көшірілді'),()=>prompt('Сілтеме:',u));else prompt('Сілтеме:',u);return}
+ const q=qrObj(k);if(!q)return toast('QR кітапханасы жүктелмеді. Интернетті тексеріңіз','err');
+ const dl=(h,e)=>{const a=document.createElement('a');a.href=h;a.download='qr-'+k+'.'+e;document.body.appendChild(a);a.click();a.remove()};
+ if(t==='svg'){let v=q.createSvgTag({cellSize:10,margin:4});if(!/xmlns=/.test(v))v=v.replace('<svg','<svg xmlns="http://www.w3.org/2000/svg"');const u=URL.createObjectURL(new Blob([v],{type:'image/svg+xml'}));dl(u,'svg');setTimeout(()=>URL.revokeObjectURL(u),1500);return}
+ const n=q.getModuleCount(),c=10,m=4,z=(n+2*m)*c,cv=document.createElement('canvas');cv.width=cv.height=z;const x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,z,z);x.fillStyle='#000';
+ for(let r=0;r<n;r++)for(let j=0;j<n;j++)if(q.isDark(r,j))x.fillRect((j+m)*c,(r+m)*c,c,c);
+ dl(cv.toDataURL('image/png'),'png');
+}
+const qrPanel=()=>`<details ${me.role==='admin'?'open':''} class="bg-white rounded-3xl border border-slate-200 p-5"><summary class="font-extrabold cursor-pointer">🔳 Жатақхана QR-кодтары (${VD().length})</summary>
+ <p class="text-xs text-slate-500 mt-2">Әр ЖОО-ның QR-ы бірегей: сканерлегенде сайт сол университетті автоматты ашады. Жүктеп алып, жатақханаға іліңіз.</p>
+ <div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-4 mt-4">${VD().map(k=>`<div class="rounded-2xl border border-slate-200 p-4 flex gap-4 items-center"><div class="w-28 h-28 shrink-0 bg-white [&>svg]:w-full [&>svg]:h-full">${qrSvg(k)}</div><div class="min-w-0 space-y-1"><div class="text-xs font-extrabold leading-snug">${esc(DORMS[k].n)}</div><div class="text-[10px] text-slate-400 break-all">?uni=${k}</div><div class="flex flex-wrap gap-1 pt-1">${[['svg','⬇ SVG'],['png','⬇ PNG'],['link','📋 Сілтеме']].map(([t,l])=>`<button data-qdl="${k}" data-t="${t}" class="px-2 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-[11px] font-bold">${l}</button>`).join('')}</div></div></div>`).join('')}</div></details>`;
+function applyUni(){
+ if(!me||!UNI)return;
+ if(me.role==='dev'){page='student';dflt=UNI}
+ else if(me.dorm!==UNI)toast('⚠️ Бұл QR басқа ЖОО-ға тиесілі. Өтінім өз ЖОО-ңызға жіберіледі: '+DORMS[me.dorm].n,'err');
+}
+const CATS={door:'🚪 Есік / Құлып',plumbing:'🚰 Сантехника',electric:'⚡ Электр жарығы',furniture:'🪑 Жиһаз / Терезе',wifi:'🌡️ Жылу / Wi-Fi'};
+const PRIO={urgent:['Шұғыл','bg-rose-100 text-rose-700'],medium:['Орташа','bg-amber-100 text-amber-700'],low:['Жоспарлы','bg-blue-100 text-blue-700']};
+const ST={open:['🔴 Ақау бар','bg-red-100 text-red-800'],in_progress:['🛠️ Жөнделуде','bg-amber-100 text-amber-800'],resolved:['🟢 Жөнделді','bg-emerald-100 text-emerald-800']};
+const TECH={door:'Плотник: Нұрлан Б.',furniture:'Плотник: Нұрлан Б.',plumbing:'Сантехник: Марат Қ.',electric:'Электрик: Серік Т.',wifi:'Электрик: Серік Т.'};
+const F='mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm font-normal outline-none focus:ring-2 focus:ring-blue-600';
+const seed0=()=>[
+ {id:'TCK-213',dorm:'kaznpu',room:'213',cat:'door',prio:'urgent',desc:'Есіктің құлпы мен топсасы сынған, есік жабылмайды.',st:'open',tech:'',time:'14:10',by:'demo1',who:'Айбек Н.',before:'',after:'',note:''},
+ {id:'TCK-104',dorm:'kaznu',room:'104',cat:'plumbing',prio:'urgent',desc:'Жуынатын бөлмедегі краннан су ағып тұр.',st:'in_progress',tech:'Сантехник: Марат Қ.',time:'12:35',by:'demo2',who:'Диана С.',before:'',after:'',note:''},
+ {id:'TCK-412',dorm:'satbayev',room:'412',cat:'electric',prio:'medium',desc:'Оқу бөлмесіндегі жарық шамдары жанып кеткен.',st:'resolved',tech:'Электрик: Серік Т.',time:'10:15',by:'demo3',who:'Ерасыл Б.',before:'',after:'',note:'LED шамдар жаңасына ауыстырылды.'}];
+
+ST.received=['📥 Қабылданды','bg-sky-100 text-sky-800'];
+const svg=(bg,ac,tag,title,type)=>{const g={door:`<rect x="145" y="25" width="110" height="115" rx="6" fill="#fef2f2" stroke="${ac}" stroke-width="3"/><path d="M175 55l45 50M220 55l-45 50" stroke="${ac}" stroke-width="4" stroke-linecap="round"/>`,pipe:`<path d="M120 60H280" stroke="#0284c7" stroke-width="12" stroke-linecap="round"/><path d="M200 70q12 26 0 38q-12-12 0-38z" fill="#38bdf8"/>`,wire:`<polygon points="205,25 175,88 202,88 192,135 230,72 202,72" fill="#d97706"/>`,fixed:`<rect x="145" y="25" width="110" height="115" rx="6" fill="#ecfdf5" stroke="${ac}" stroke-width="3"/><circle cx="200" cy="82" r="24" fill="${ac}"/><path d="M189 82l8 8 15-16" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/>`}[type];return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="420" height="220" viewBox="0 0 420 220"><rect width="420" height="220" fill="${bg}"/>${g}<rect x="16" y="150" width="388" height="54" rx="12" fill="rgba(255,255,255,.94)"/><text x="210" y="173" text-anchor="middle" font-family="Inter,sans-serif" font-size="14" font-weight="800" fill="#0f172a">${title}</text><text x="210" y="192" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="700" fill="${ac}">${tag}</text></svg>`)};
+const PH={door:svg('#fee2e2','#dc2626','BEFORE','ЕСІК ҚҰЛПЫ СЫНҒАН','door'),pipe:svg('#e0f2fe','#0284c7','BEFORE','САНТЕХНИКА — СУ АҒУДА','pipe'),wire:svg('#fef3c7','#d97706','BEFORE','ЭЛЕКТР ЖЕЛІСІ АҚАУЫ','wire'),fixed:svg('#d1fae5','#059669','AFTER','ЖӨНДЕЛДІ — ҚАБЫЛДАНДЫ','fixed')};
+const seed=()=>seed0().map(t=>({...t,before:PH[{door:'door',plumbing:'pipe',electric:'wire'}[t.cat]]||'',after:t.st==='resolved'?PH.fixed:''}));
+let users=LS('cc_users')||[],tickets=[],me=null,mode='login',flt='all',dflt='all',rid=null,map=null,layer=null,back=null,page='student',q='';
+let contacts=LS('cc_contacts')||{};
+let landing=true,preDorm='';
+const V=()=>me.role==='dev'?tickets:tickets.filter(t=>t.dorm===me.dorm),VD=()=>me.role==='dev'?Object.keys(DORMS):[me.dorm];
+const save=()=>{try{LS('cc_users',users);LS('cc_contacts',contacts)}catch(e){toast('Жад толды: кішірек фото таңдаңыз','err')}};
+const fromT=r=>({...r,time:r.created?new Date(String(r.created).replace(' ','T')+'Z').toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}):''});
+const sig=a=>a.map(t=>t.id+t.st+(t.tech||'')+(t.after?1:0)).join();
+async function loadT(){if(!me)return;const r=await api('/tickets/list');if(!r.ok)return;const n=r.tickets.map(fromT);if(sig(n)===sig(tickets)&&n.length===tickets.length)return;tickets=n;render()}
+const upd=x=>{const y=fromT(x),i=tickets.findIndex(t=>t.id===y.id);if(i>=0)tickets[i]=y;else tickets.unshift(y)};
+setInterval(()=>{if(!me)return;const a=document.activeElement;if(a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName))return;if($('#dlg')&&$('#dlg').open)return;loadT()},30000);
+const H=async s=>{try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){return btoa(unescape(encodeURIComponent(s)))}};
+const img=f=>new Promise(r=>{const fr=new FileReader();fr.onload=()=>{const i=new Image();i.onload=()=>{const k=Math.min(1,640/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height);r(c.toDataURL('image/jpeg',.7))};i.onerror=()=>r('');i.src=fr.result};fr.onerror=()=>r('');fr.readAsDataURL(f)});
+function toast(m,t){const d=document.createElement('div');d.className='px-4 py-3 rounded-2xl bg-slate-900 text-white text-xs font-bold shadow-2xl border-l-4 '+(t==='err'?'border-red-500':'border-emerald-500');d.textContent=m;$('#toast').appendChild(d);setTimeout(()=>d.remove(),3500)}
+
+/* ---------- ортақ бөліктер ---------- */
+const dormOpts=sel=>Object.entries(DORMS).map(([k,d])=>`<option value="${k}"${k===sel?' selected':''}>${d.n}</option>`).join('');
+const inp=(id,l,t='text',x='required')=>`<label class="block text-xs font-bold text-slate-600">${l}<input id="${id}" type="${t}" ${x} class="${F}"></label>`;
+const sel=(id,o,fn)=>`<select id="${id}" class="${F}">${Object.entries(o).map(([k,v])=>`<option value="${k}">${fn(v)}</option>`).join('')}</select>`;
+const badge=m=>`<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold ${m[1]}">${m[0]}</span>`;
+const stage=t=>{const s={open:1,received:2,in_progress:3,resolved:4}[t.st];return `<div class="grid grid-cols-4 gap-1 text-[10px] font-bold text-center">${['Жіберілді','Қабылданды','Жөнделуде','Жөнделді'].map((x,i)=>`<div class="py-1 rounded ${i<s?(s===4&&i===3?'bg-emerald-600':'bg-blue-600')+' text-white':'bg-slate-200 text-slate-500'}">${x}</div>`).join('')}</div>`};
+const photos=t=>(t.before||t.after)?`<div class="grid grid-cols-2 gap-2">${t.before?`<img src="${t.before}" alt="Дейін" class="w-full h-24 object-cover rounded-xl border border-slate-200">`:'<div></div>'}${t.after?`<img src="${t.after}" alt="Кейін" class="w-full h-24 object-cover rounded-xl border-2 border-emerald-500">`:''}</div>`:'';
+const card=(t,adm)=>`
+<div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-2">
+ <div class="flex flex-wrap items-center gap-2">${badge(ST[t.st])}${badge(PRIO[t.prio])}<span class="text-[11px] font-bold text-slate-400">${t.id} • ${t.time}</span></div>
+ <div class="font-bold text-sm">${DORMS[t.dorm].n}, <span class="text-blue-600">№${esc(t.room)}</span></div>${t.geo?'<div class="text-[11px] font-bold text-emerald-700">📍 Геолокация расталған</div>':''}
+ <div class="text-xs text-slate-500">${CATS[t.cat]}${adm?' • 👤 '+esc(t.who):''}${t.tech?' • 🛠️ '+esc(t.tech):''}</div>
+ <p class="text-sm text-slate-600">${esc(t.desc)}</p>${photos(t)}${stage(t)}
+ ${t.note?`<div class="p-2 rounded-xl bg-emerald-50 text-emerald-900 text-xs font-semibold">✅ ${esc(t.note)}</div>`:''}
+ ${adm?`<div class="flex flex-wrap items-center gap-2 pt-1">${me.role==='dev'?`<select data-st="${t.id}" class="rounded-xl border border-slate-300 bg-white px-2.5 py-2 text-xs font-bold">${['open','received','in_progress','resolved'].map(k=>`<option value="${k}"${k===t.st?' selected':''}>${ST[k][0]}</option>`).join('')}</select>`:''}${t.st==='open'?`<button data-ac="${t.id}" class="px-3 py-2 rounded-xl border border-slate-300 hover:bg-slate-100 text-xs font-extrabold">📥 Қабылдау</button>`:''}${t.st==='open'||t.st==='received'?`<button data-as="${t.id}" class="px-3 py-2 rounded-xl border border-slate-300 hover:bg-slate-100 text-xs font-extrabold">🛠️ Шебер жіберу</button>`:''}${t.st!=='resolved'?`<button data-rs="${t.id}" class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold">📷 Жөнделді</button>`:''}</div>`:''}
+</div>`;
+const header=()=>`
+<header class="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-slate-200">
+ <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+  <div class="${me.role==='student'?'':'lg:hidden '}flex items-center gap-3">${logo(36)}<div><div class="font-extrabold leading-tight">Ortaq Campus</div><div class="text-[11px] text-slate-500">${me.role==='admin'?'Әкімшілік панелі':me.role==='dev'?'Әзірлеуші мәзірі':'Студент кабинеті'}</div></div></div>
+  ${me.role!=='student'?`<div class="hidden lg:block"><div class="font-extrabold text-lg leading-tight">${PAGES[page]}</div><div class="text-[11px] text-slate-500">${me.role==='admin'?DORMS[me.dorm].n:'Барлық ЖОО • Super Admin'}</div></div>`:''}
+  <div class="flex items-center gap-3"><div class="text-right hidden sm:block"><div class="text-xs font-bold">${esc(me.name)}</div><div class="text-[11px] text-slate-500">${esc(me.email)}</div></div>
+  <a href="tel:112" class="px-3 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-extrabold">🆘 112</a>${back?'<button id="bk" class="px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold">← Әзірлеуші мәзірі</button>':''}<button id="out" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold">Шығу</button></div>
+ </div>
+</header>`;
+
+/* ---------- эмблемалар: Ortaq Campus логотипі және ЖИ белгісі ---------- */
+let _lgi=0;
+const BRAND_COLS=['#ff4d6d','#38bdf8','#fbbf24','#34d399']; // Ақау бар → Қабылданды → Жөнделуде → Жөнделді (сағат тілімен)
+const ringArcs=(cx,cy,r,ws,gap)=>BRAND_COLS.map((c,i)=>{const a0=(i*90-90+gap/2)*Math.PI/180,a1=((i+1)*90-90-gap/2)*Math.PI/180,p=a=>[cx+r*Math.cos(a),cy+r*Math.sin(a)].map(n=>n.toFixed(2));const [x0,y0]=p(a0),[x1,y1]=p(a1);return `<path d="M${x0} ${y0}A${r} ${r} 0 0 1 ${x1} ${y1}" stroke="${c}" stroke-width="${ws[i]}" stroke-linecap="round"/>`}).join('');
+const logo=(sz=40)=>{const id='lg'+(++_lgi);return `<svg width="${sz}" height="${sz}" viewBox="0 0 64 64" fill="none" class="shrink-0" role="img" aria-label="Ortaq Campus"><defs><linearGradient id="${id}a" x1="6" y1="2" x2="58" y2="62" gradientUnits="userSpaceOnUse"><stop stop-color="#2a2f7a"/><stop offset="1" stop-color="#090d24"/></linearGradient><radialGradient id="${id}b" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(18 10) rotate(45) scale(46)"><stop stop-color="#fff" stop-opacity=".22"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" rx="18" fill="url(#${id}a)"/><rect width="64" height="64" rx="18" fill="url(#${id}b)"/><rect x=".75" y=".75" width="62.5" height="62.5" rx="17.25" stroke="#fff" stroke-opacity=".14" stroke-width="1.5"/>${ringArcs(32,32,17,[3,4.5,6,7.5],26)}<path d="M32 22.5c-4.6 0-7.7 3.3-7.7 7.4 0 5 5.4 9.6 7.7 11.8 2.3-2.2 7.7-6.8 7.7-11.8 0-4.1-3.1-7.4-7.7-7.4z" fill="#fff"/><circle cx="32" cy="30" r="3" fill="#0d1130"/></svg>`};
+const aiIcon=(sz=26)=>{const id='ai'+(++_lgi);return `<svg width="${sz}" height="${sz}" viewBox="0 0 48 48" fill="none" aria-hidden="true"><defs><linearGradient id="${id}" x1="6" y1="2" x2="42" y2="46" gradientUnits="userSpaceOnUse"><stop stop-color="#312e81"/><stop offset="1" stop-color="#0b1030"/></linearGradient></defs><circle cx="24" cy="24" r="24" fill="url(#${id})"/><g><animateTransform attributeName="transform" type="rotate" from="0 24 24" to="360 24 24" dur="16s" repeatCount="indefinite"/>${ringArcs(24,24,18.5,[2.6,3.4,4.2,5],30)}</g><path d="M17.5 17h13a4.5 4.5 0 0 1 4.5 4.5v4.2a4.5 4.5 0 0 1-4.5 4.5H25l-5.6 4.3v-4.3h-1.9A4.5 4.5 0 0 1 13 25.7v-4.2A4.5 4.5 0 0 1 17.5 17z" fill="#fff"/><circle cx="19.2" cy="23.6" r="1.5" fill="#312e81"/><circle cx="24" cy="23.6" r="1.5" fill="#312e81"/><circle cx="28.8" cy="23.6" r="1.5" fill="#312e81"/></svg>`};
+
+/* ---------- басты бет (Landing) ---------- */
+const landingView=()=>{
+ const steps=[['📱','QR сканерлеңіз','Жатақханадағы QR-кодты телефонмен сканерлеңіз.'],['📝','Ақауды сипаттаңыз','Бөлме, санат пен фото: 15 секунд жеткілікті.'],['🔔','Әкімшілік біледі','Өтінім сіздің ЖОО әкімшілігіне бірден жетеді.'],['✅','Жөнделді','Статусты қадағалаңыз: Ақау бар → Қабылданды → Жөнделуде → Жөнделді.']];
+ const feats=[['🗺️','Тірі карта','Ақау картада қызыл болып жанады, жөнделген соң жасыл болады.'],['🏫','Әр ЖОО жеке','Әкімшілік тек өз университетінің өтінімдерін көреді.'],[aiIcon(36),'ЖИ көмекші','Қазақша, орысша, ағылшынша сұрақтарға жауап береді.'],['🆘','Төтенше нөмірлер','112, 101, 102, 103, 104 бір түртумен қол жетімді.']];
+ const unis=Object.entries(DORMS).map(([k,d])=>{const [u,h]=d.n.split(' — ');return `<button data-go="reg" data-d="${k}" class="text-left p-5 rounded-3xl bg-white border border-slate-200 hover:border-blue-400 hover:shadow-lg transition space-y-1"><div class="text-2xl">🏫</div><div class="font-extrabold text-sm leading-snug">${esc(u)}</div><div class="text-xs text-blue-600 font-bold">${esc(h||'Жатақхана')}</div><div class="text-xs text-slate-500">📍 ${esc(d.a)}</div></button>`}).join('');
+ return `
+<header class="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-slate-200"><div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+ <a href="#" class="flex items-center gap-2 font-extrabold">${logo(36)}Ortaq Campus</a>
+ <nav class="hidden md:flex gap-5 text-sm font-bold text-slate-600"><a href="#how" class="hover:text-blue-600">Қалай жұмыс істейді</a><a href="#unis" class="hover:text-blue-600">ЖОО-лар</a><a href="#feat" class="hover:text-blue-600">Мүмкіндіктер</a></nav>
+ <div class="flex items-center gap-2"><a href="tel:112" class="hidden sm:inline-block px-3 py-2 rounded-xl bg-red-600 text-white text-xs font-extrabold">🆘 112</a><button data-go="login" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold">Кіру</button><button data-go="reg" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold">Тіркелу</button></div></div></header>
+<main>
+<section class="max-w-6xl mx-auto px-4 pt-6"><div class="relative overflow-hidden rounded-3xl p-7 sm:p-12 text-white bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950 grid md:grid-cols-2 gap-6 items-center">
+ <div class="relative z-10 space-y-4"><span class="inline-block px-3 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-200 text-xs font-bold">Smart Dormitory • Алматы</span>
+ <h1 class="text-3xl sm:text-5xl font-extrabold leading-tight">Жатақханадағы ақауды <span class="text-amber-400">15 секундта</span> хабарлаңыз</h1>
+ <p class="text-slate-300 text-sm sm:text-base">Ortaq Campus: Алматы ЖОО жатақханаларының ортақ жүйесі. Студент QR арқылы өтінім жібереді, әкімшілік жедел көреді, шебер жөндейді.</p>
+ <div class="flex flex-wrap gap-3 pt-2"><button data-go="login" class="px-6 py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-900 font-extrabold text-sm">📝 Өтініш беру</button><button data-go="login" class="px-6 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 font-extrabold text-sm">Кіру →</button></div>
+ <div class="flex gap-6 pt-3 text-xs text-slate-300"><div><b class="block text-2xl text-white">${Object.keys(DORMS).length}</b>ЖОО</div><div><b class="block text-2xl text-white">24/7</b>қолжетімді</div><div><b class="block text-2xl text-white">3</b>тіл</div></div></div>
+ <div class="relative z-10 hidden md:block">${art()}</div></div></section>
+<section id="how" class="max-w-6xl mx-auto px-4 pt-14"><h2 class="text-2xl sm:text-3xl font-extrabold text-center">Қалай жұмыс істейді?</h2><p class="text-center text-slate-500 text-sm mt-1">Төрт қарапайым қадам</p>
+ <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">${steps.map(([i,t,d],n)=>`<div class="bg-white rounded-3xl p-5 border border-slate-200 space-y-2"><div class="flex items-center justify-between"><span class="text-3xl">${i}</span><span class="w-7 h-7 rounded-full bg-blue-600 text-white text-xs font-extrabold flex items-center justify-center">${n+1}</span></div><div class="font-extrabold">${t}</div><p class="text-xs text-slate-500">${d}</p></div>`).join('')}</div></section>
+<section id="unis" class="max-w-6xl mx-auto px-4 pt-14"><h2 class="text-2xl sm:text-3xl font-extrabold text-center">Қосылған ЖОО-лар</h2><p class="text-center text-slate-500 text-sm mt-1">Өз университетіңізді таңдап, тіркеліңіз</p>
+ <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">${unis}</div></section>
+<section id="feat" class="max-w-6xl mx-auto px-4 pt-14"><h2 class="text-2xl sm:text-3xl font-extrabold text-center">Мүмкіндіктер</h2>
+ <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">${feats.map(([i,t,d])=>`<div class="rounded-3xl p-5 bg-gradient-to-br from-blue-600 to-indigo-700 text-white space-y-2"><div class="text-3xl">${i}</div><div class="font-extrabold">${t}</div><p class="text-xs text-blue-100">${d}</p></div>`).join('')}</div></section>
+<section class="max-w-6xl mx-auto px-4 py-14"><div class="rounded-3xl p-8 sm:p-10 bg-slate-900 text-white text-center space-y-4"><h2 class="text-2xl sm:text-3xl font-extrabold">Бастауға дайынсыз ба?</h2><p class="text-slate-300 text-sm">Тіркеліңіз немесе кіріңіз, ақау туралы бірден хабарлаңыз.</p><div class="flex flex-wrap justify-center gap-3"><button data-go="login" class="px-6 py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-900 font-extrabold text-sm">📝 Өтініш беру</button><button data-go="reg" class="px-6 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 font-extrabold text-sm">Тіркелу</button></div></div></section>
+${dStatsBlock()}</main>
+<footer class="border-t border-slate-200 bg-white/70"><div class="max-w-6xl mx-auto px-4 py-5 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500"><span>© Ortaq Campus • Алматы</span><span>Әзірлеуші: <b>Әбіл Сейдаканов</b></span><span>Төтенше: <b>112</b> • 101 • 102 • 103 • 104</span></div></footer>`};
+
+/* ---------- тіркелу / кіру ---------- */
+const authView=()=>{const reg=mode==='reg';return `
+<div class="min-h-screen grid lg:grid-cols-2">
+ <div class="hidden lg:flex flex-col justify-center gap-4 p-14 text-white bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950">
+  <h1 class="text-4xl font-extrabold flex items-center gap-3">${logo(52)}Ortaq Campus</h1><div class="w-full max-w-sm">${art()}</div>
+  <p class="text-slate-300 max-w-md">Жатақханадағы ақауды 15 секундта хабарлаңыз. Өтінім картада ҚЫЗЫЛ болып жанады, жөнделген соң ЖАСЫЛ болады.</p>
+ </div>
+ <div class="flex items-center justify-center p-6">
+  <form id="auth" class="w-full max-w-md bg-white rounded-3xl p-7 border border-slate-200 space-y-3">
+   <div class="lg:hidden flex items-center justify-center gap-2 font-extrabold text-xl">${logo(36)}Ortaq Campus</div>
+   <button type="button" id="to-land" class="text-xs font-bold text-slate-500 hover:text-blue-600">← Басты бет</button>
+   ${UNI?`<div class="rounded-xl bg-blue-50 border border-blue-200 text-blue-800 text-xs font-bold p-3">📷 QR арқылы келдіңіз: ${esc(DORMS[UNI].n)}</div>`:''}
+   <div class="flex rounded-xl bg-slate-100 p-1 text-sm font-bold">${[['login','Кіру'],['reg','Тіркелу']].map(([k,l])=>`<button type="button" data-m="${k}" class="flex-1 py-2 rounded-lg ${mode===k?'bg-white text-blue-700 shadow-sm':'text-slate-500'}">${l}</button>`).join('')}</div>
+   ${reg?inp('name','Аты-жөні'):''}${inp('email','Email','email')}${inp('pw','Құпиясөз (кемінде 8 таңба)','password','required minlength="8"')}${!reg?inp('pcode','Жеке код (тек әкімші / әзірлеуші үшін)','password','autocomplete="off"'):''}
+   ${reg?`
+   <label class="block text-xs font-bold text-slate-600">Университет<select id="dorm" class="${F}">${dormOpts(preDorm||undefined)}</select></label>
+   <label class="block text-xs font-bold text-slate-600">Жатақхана<select id="dorm2" class="${F}">${dormOpts2(preDorm||Object.keys(DORMS)[0])}</select></label>
+   <div id="stu" class="space-y-3">${inp('room','Бөлме нөмірі','text','placeholder="213"')}${inp('scode','Университет коды (өз университетіңіздің әкімшілігінен алыңыз)','text','')}</div>`:''}
+   <button class="w-full py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm">${reg?'Тіркелу':'Кіру'}</button>
+  </form>
+ </div>
+</div>`};
+const API=AI_URL.replace(/\/+$/,'');
+async function api(path,body){
+ try{
+  const t=localStorage.getItem('cc_token');
+  const r=await fetch(API+path,{method:'POST',headers:{'Content-Type':'application/json',...(t?{Authorization:'Bearer '+t}:{})},body:JSON.stringify(body||{})});
+  const j=await r.json();j.status=r.status;return j;
+ }catch(e){return{ok:false,status:0,error:'Серверге қосылу мүмкін болмады. Интернетті тексеріңіз'}}
+}
+const fromServer=s=>{if(s.dormId&&s.role==='student')saveDid(s.dormId);return {name:s.name,email:s.email,role:s.role,dorm:s.uni,room:s.room||''}};
+/* ЖОО байланысы мен ақпараты серверде сақталады (/info/*), барлық құрылғыда көрінеді */
+async function loadInfo(){if(!me)return;const r=await api('/info/list');if(r.ok&&r.info){contacts={...contacts,...r.info};if(!(document.activeElement&&/INPUT|TEXTAREA/.test(document.activeElement.tagName)))render()}}
+async function onAuth(e){
+ e.preventDefault();const btn=e.submitter;if(btn)btn.disabled=true;
+ try{
+  const email=$('#email').value.trim().toLowerCase(),password=$('#pw').value;let r;
+  if(mode==='login')r=await api('/auth/login',{email,password,pcode:($('#pcode')?$('#pcode').value.trim():'')});
+  else{
+   const dorm=$('#dorm').value,room=$('#room').value.trim();
+   
+   if(!room)return toast('Бөлме нөмірін жазыңыз','err');
+   r=await api('/auth/register',{name:$('#name').value.trim(),email,password,uni:dorm,room,code:$('#scode').value.trim(),dormId:$('#dorm2').value});if(r.ok)saveDid($('#dorm2').value);
+  }
+  if(!r.ok||!r.user||!DORMS[r.user.uni])return toast(r.error||r.reply||('Қате шықты (HTTP '+r.status+(r.user?', uni='+r.user.uni:'')+')'),'err');
+  localStorage.setItem('cc_token',r.token);enter(fromServer(r.user));
+ }finally{if(btn)btn.disabled=false}
+}
+function enter(u){if(u.role==='student'&&!FULL){location.href=DASH;return}users=users.filter(x=>x.email!==u.email);users.push(u);save();back=null;me=u;page=HOME[u.role];q='';dflt=u.role==='admin'?u.dorm:'all';flt='all';applyUni();render();loadT();loadInfo();toast('Қош келдіңіз, '+u.name)}
+function logout(){api('/auth/logout');localStorage.removeItem('cc_token');me=null;back=null;landing=!UNI;mode='login';render()}
+
+/* ---------- студент беті ---------- */
+const studentView=()=>{const my=me.role==='dev'?tickets:tickets.filter(t=>t.by===me.email),d0=(me.role==='dev'&&UNI)?UNI:me.dorm;return `
+<main class="max-w-[1500px] mx-auto px-4 py-6 space-y-6">
+ <section class="relative overflow-hidden rounded-3xl p-6 sm:p-8 text-white bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950">
+  <div class="relative z-10 max-w-xl space-y-2"><span class="inline-block px-3 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-200 text-xs font-bold">Smart Dormitory • Сәлем, ${esc(me.name)}</span>
+  <h1 class="text-2xl sm:text-3xl font-extrabold leading-tight">Бөлмеде бірдеңе сынды ма? QR-ды сканерлеп, 15 секундта хабарлаңыз!</h1>
+  <p class="text-sm text-slate-300">Өтінім әкімшілікке жедел түсіп, картада ҚЫЗЫЛ белгімен жанады, жөнделген соң ЖАСЫЛ болады.</p></div>
+  <div class="absolute -right-4 bottom-0 w-72 opacity-25 sm:opacity-70">${art()}</div>
+ </section>
+ <div class="grid lg:grid-cols-12 gap-6">
+  <div class="lg:col-span-5 bg-white rounded-3xl p-6 border border-slate-200 space-y-4 self-start">
+    <div class="rounded-2xl bg-slate-900 p-5 text-white space-y-1"><div class="text-xs font-bold text-amber-400">${UNI&&UNI===d0?'📷 QR арқылы ашылды':'🏫 Сіздің ЖОО'}</div><div class="font-extrabold">${DORMS[d0].n}</div><div class="text-xs text-slate-300">📍 ${esc(dormName(d0,myDid(d0)))}, ${esc(dormAddr(d0,myDid(d0)))}</div><div class="text-xs font-extrabold text-amber-400">№${esc(me.room||'—')} бөлме</div></div>
+    <p class="text-xs text-slate-500">Өтінім осы университеттің әкімшілігіне автоматты жіберіледі. Жатақханадағы QR-ды сканерлесеңіз, жүйе өз ЖОО-ңызды өзі таңдайды.</p>
+   </div>
+  <form id="rep" class="lg:col-span-7 bg-white rounded-3xl p-6 border border-slate-200 space-y-3">
+   <h2 class="font-bold text-lg">Ақау туралы өтінім</h2>
+   <div class="grid sm:grid-cols-3 gap-3">
+    <label class="sm:col-span-2 block text-xs font-bold text-slate-600">Университет / жатақхана<select id="fdm" class="${F}"${me.role==='dev'?'':' disabled'}>${dormOpts(d0)}</select></label>
+    <label class="block text-xs font-bold text-slate-600">Бөлме<input id="rm" value="${esc(me.room)}" required class="${F}"></label>
+    <label class="sm:col-span-3 block text-xs font-bold text-slate-600">Жатақхана<select id="fdm2" class="${F}">${dormOpts2(d0,myDid(d0))}</select></label>
+    <label class="block text-xs font-bold text-slate-600">Санат${sel('cat',CATS,v=>v)}</label>
+    <label class="block text-xs font-bold text-slate-600">Маңыздылығы${sel('pr',PRIO,v=>v[0])}</label>
+   </div>
+   <label class="block text-xs font-bold text-slate-600">Сипаттамасы<textarea id="desc" rows="2" required class="${F}"></textarea></label>
+   <div class="flex flex-wrap items-center gap-2 text-xs"><span class="font-bold text-slate-600">Фото:</span><input id="ph" type="file" accept="image/*" class="text-xs">${[['door','🚪 Есік'],['pipe','🚰 Су'],['wire','⚡ Электр']].map(([k,l])=>`<button type="button" data-demo="${k}" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 font-bold">${l}</button>`).join('')}</div>
+   <img id="pv" alt="" class="hidden h-24 rounded-xl border border-slate-200">
+   <div class="space-y-2">
+    <div class="flex items-center justify-between gap-2 flex-wrap"><span class="text-xs font-bold text-slate-600">📍 Ақау орнын картадан белгілеңіз (сіздің GPS-тен ≤ ${GEO_RADIUS} м)</span><button type="button" id="geo-b" class="hidden px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold">📍 Қайта сұрау</button></div>
+    <div id="pmap" style="height:260px" class="rounded-2xl border border-slate-200"></div>
+    <span id="geo-s" class="inline-block text-xs font-bold px-3 py-1.5 rounded-full border bg-amber-50 text-amber-700 border-amber-200">⏳ Геолокация тексерілуде…</span>
+   </div>
+   <button id="sub-b"${geoOkNow()?'':' disabled'} class="w-full py-3 rounded-2xl bg-gradient-to-r from-red-600 to-rose-600 text-white font-extrabold text-sm shadow-lg shadow-red-600/20 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none">Әкімшілікке жіберу</button>
+  </form>
+ </div>
+ <section><h2 class="font-bold text-lg mb-3">${me.role==='dev'?'Барлық өтінімдер':'Менің өтінімдерім'} (${my.length})</h2>
+  <div class="grid md:grid-cols-2 2xl:grid-cols-3 gap-4">${my.map(t=>card(t)).join('')||'<p class="text-sm text-slate-500">Әзірге өтінім жоқ.</p>'}</div></section>
+</main>`};
+const okDom=(e,d)=>e.endsWith('@'+d)||e.endsWith('.'+d);
+const distM=(a,b,c,d)=>{const r=Math.PI/180,x=Math.sin((c-a)*r/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin((d-b)*r/2)**2;return 12742000*Math.asin(Math.sqrt(x))};
+function notifyAdmin(t,verbose){
+ if(!AI_URL)return;
+ fetch(AI_URL.replace(/\/+$/,'')+'/notify',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+(localStorage.getItem('cc_token')||'')},body:JSON.stringify({campus:t.dorm,campusName:DORMS[t.dorm].n+(t.dormId?' — '+dormName(t.dorm,t.dormId):''),id:t.id,room:t.room,cat:CATS[t.cat]||t.cat,prio:(PRIO[t.prio]||[t.prio])[0],desc:t.desc,who:t.who,loc:(t.lat!=null&&t.lng!=null)?t.lat+','+t.lng:'',photo:(t.before||'').startsWith('data:image/jpeg')?t.before:''})})
+  .then(r=>r.json()).then(d=>{if(d.sent)toast('📨 Әкімшілікке хабар жіберілді: '+(d.via||[]).join(', '));else if(verbose)toast('⚠️ Хабар кетпеді: '+(d.why||'белгісіз қате'),'err')})
+  .catch(()=>{if(verbose)toast('⚠️ Worker-ге қосылу мүмкін болмады','err')});
+}
+/* ---------- геолокация: автоматты рұқсат, Haversine, 20 м радиус ---------- */
+let userPos=null,geoSt='idle',geoWid=null,pickPt=null,pmap=null,pMk=null,pCirc=null,uMk=null,meMk=null;
+const needGeo=()=>GEO_REQUIRED&&!!me&&me.role!=='dev';
+const pickDist=()=>(userPos&&pickPt)?distM(userPos.lat,userPos.lng,pickPt.lat,pickPt.lng):null;
+function geoOkNow(){if(!needGeo())return true;const d=pickDist();return d!==null&&d<=GEO_RADIUS}
+function geoUI(){
+ const s=$('#geo-s'),b=$('#sub-b'),r=$('#geo-b'),form=!!b;
+ const C={ok:'bg-emerald-50 text-emerald-700 border-emerald-200',warn:'bg-amber-50 text-amber-700 border-amber-200',bad:'bg-red-50 text-red-700 border-red-200',info:'bg-sky-50 text-sky-700 border-sky-200'};
+ let t,c;
+ if(!needGeo()){t='🧑‍💻 Әзірлеуші: геолокация тексерілмейді';c='info'}
+ else if(geoSt==='unsupported'){t='⚠️ Браузер геолокацияны қолдамайды'+(form?'. Өтінім жіберу бұғатталды':'');c='bad'}
+ else if(geoSt==='denied'){t='🚫 Геолокацияға рұқсат берілмеген (браузер баптауын және HTTPS-ті тексеріңіз)'+(form?'. Өтінім жіберу бұғатталды':'');c='bad'}
+ else if(!userPos){t=geoSt==='nofix'?'📡 GPS сигналы жоқ, күте тұрыңыз…':'⏳ Геолокацияға рұқсат сұралуда…';c='warn'}
+ else if(!form){t='📍 Орныңыз анықталды (±'+Math.round(userPos.acc)+' м)';c='ok'}
+ else{const d=Math.round(pickDist());
+  if(d<=GEO_RADIUS){t='✅ Нүкте сізден '+d+' м (≤ '+GEO_RADIUS+' м). Жіберуге болады • GPS ±'+Math.round(userPos.acc)+' м';c='ok'}
+  else{t='❌ Нүкте сізден '+d+' м алыс (рұқсат '+GEO_RADIUS+' м). Жіберу өшірілді';c='bad'}}
+ if(s){s.className=(form?'inline-block ':'')+'text-xs font-bold px-3 py-1.5 rounded-full border '+C[c];s.textContent=t}
+ if(b)b.disabled=!geoOkNow();
+ if(r)r.classList.toggle('hidden',!(needGeo()&&['denied','nofix','unsupported'].includes(geoSt)));
+}
+function startGeo(force){
+ if(!needGeo())return;
+ if(!navigator.geolocation){geoSt='unsupported';geoUI();return}
+ if(geoWid!==null){if(!force)return;navigator.geolocation.clearWatch(geoWid);geoWid=null}
+ geoSt='wait';geoUI();
+ geoWid=navigator.geolocation.watchPosition(p=>{
+  userPos={lat:p.coords.latitude,lng:p.coords.longitude,acc:p.coords.accuracy};geoSt='ok';
+  if(!pickPt)pickPt={lat:userPos.lat,lng:userPos.lng};
+  syncPick();showMe();geoUI();
+ },e=>{
+  if(e.code===1){geoSt='denied';userPos=null;if(geoWid!==null)navigator.geolocation.clearWatch(geoWid);geoWid=null}
+  else if(!userPos)geoSt='nofix';
+  geoUI();
+ },{enableHighAccuracy:true,maximumAge:3000,timeout:20000});
+}
+function syncPick(){
+ if(!pmap)return;
+ const ll=p=>[p.lat,p.lng],ok=!needGeo()||(pickDist()!==null&&pickDist()<=GEO_RADIUS),col=ok?'#059669':'#dc2626';
+ if(pickPt){if(pMk)pMk.setLatLng(ll(pickPt)).setStyle({color:col,fillColor:col});else pMk=L.circleMarker(ll(pickPt),{radius:9,color:col,fillColor:col,fillOpacity:.9,weight:3}).addTo(pmap)}
+ if(userPos){
+  if(uMk)uMk.setLatLng(ll(userPos));else uMk=L.circleMarker(ll(userPos),{radius:6,color:'#fff',weight:2,fillColor:'#2563eb',fillOpacity:1}).bindPopup('📍 Сіз осындасыз').addTo(pmap);
+  if(pCirc)pCirc.setLatLng(ll(userPos));else pCirc=L.circle(ll(userPos),{radius:GEO_RADIUS,color:'#2563eb',weight:2,fillOpacity:.08}).addTo(pmap);
+  if(!pmap._fit){pmap.setView(ll(userPos),19);pmap._fit=1}
+ }
+}
+function initPick(){
+ const el=$('#pmap');if(!el)return;
+ if(!pickPt&&userPos)pickPt={lat:userPos.lat,lng:userPos.lng};
+ if(typeof L==='undefined'){el.innerHTML='<div class="h-full flex items-center justify-center text-xs text-slate-500 p-4 text-center">Карта жүктелмеді. Нүкте GPS орныңыз бойынша автоматты алынады.</div>';return}
+ const c=userPos?[userPos.lat,userPos.lng]:(DORMS[(me.role==='dev'&&UNI)?UNI:me.dorm].p||ALM);
+ pmap=L.map(el,{center:c,zoom:userPos?19:17,maxZoom:19});
+ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap',maxZoom:19}).addTo(pmap);
+ if(userPos)pmap._fit=1;
+ pmap.on('click',e=>{
+  if(needGeo()&&!userPos)return toast('Алдымен геолокацияға рұқсат беріңіз','err');
+  pickPt={lat:e.latlng.lat,lng:e.latlng.lng};syncPick();geoUI();
+  const d=pickDist();if(d!==null&&d>GEO_RADIUS)toast('⚠️ Нүкте сізден '+Math.round(d)+' м алыс. Рұқсат етілген радиус — '+GEO_RADIUS+' м','err');
+ });
+ syncPick();geoUI();setTimeout(()=>pmap&&pmap.invalidateSize(),250);
+}
+function showMe(){
+ if(!userPos||!map||page!=='map')return;
+ const ll=[userPos.lat,userPos.lng];
+ try{
+  if(map.addLayer){if(meMk)meMk.setLatLng(ll);else meMk=L.circleMarker(ll,{radius:7,color:'#fff',weight:2,fillColor:'#2563eb',fillOpacity:1}).bindPopup('📍 Сіз осындасыз').addTo(map)}
+  else if(map.geoObjects){if(meMk)meMk.geometry.setCoordinates(ll);else{meMk=new ymaps.Placemark(ll,{balloonContent:'📍 Сіз осындасыз'},{preset:'islands#geolocationIcon'});map.geoObjects.add(meMk)}}
+ }catch(e){}
+}
+async function onReport(e){
+ e.preventDefault();const f=$('#ph').files[0];
+ if(!geoOkNow()){geoUI();return toast('Өтінім нүктесі сіздің GPS орныңыздан ≤ '+GEO_RADIUS+' м болуы және геолокацияға рұқсат берілуі керек','err')}
+ const ge=needGeo()&&!!userPos,pt=pickPt;
+ const did=$('#fdm2')?$('#fdm2').value:'';saveDid(did);
+ const payload={dorm:me.role==='dev'?$('#fdm').value:me.dorm,dormId:did,room:$('#rm').value.trim(),cat:$('#cat').value,prio:$('#pr').value,desc:$('#desc').value.trim(),before:f?await img(f):($('#pv').dataset.s||''),geo:ge,lat:pt?+pt.lat.toFixed(6):null,lng:pt?+pt.lng.toFixed(6):null};
+  payload.campusName=DORMS[payload.dorm].n+(did?' — '+dormName(payload.dorm,did):'');const r=await api('/api/submit-issue',payload);if(!r.ok)return toast(r.error||'Қате шықты','err');
+  upd(r.ticket);tickets[0].dormId=did;
+  pickPt=null;const nt=r.notified||{},via=[nt.telegram&&'Telegram',nt.email&&'Email'].filter(Boolean);if(via.length)toast('📨 Әкімшілікке хабар жіберілді: '+via.join(', '));render();toast('Өтінім жіберілді! Картада ҚЫЗЫЛ белгі жанды');
+}
+
+/* ---------- әкімшілік беті ---------- */
+const kpi=(l,v,c)=>`<div class="bg-white p-5 rounded-2xl border border-slate-200"><div class="text-xs font-bold text-slate-500">${l}</div><div class="text-3xl font-extrabold mt-1 ${c}">${v}</div></div>`;
+
+const tbl=list=>`<div class="hidden lg:block bg-white rounded-3xl border border-slate-200 overflow-x-auto"><div class="px-5 pt-4 font-extrabold">Өтінімдер кестесі (${list.length})</div><table class="w-full text-xs mt-2"><thead class="bg-slate-50 text-slate-500"><tr>${['ID','ЖОО','Бөлме','Санат','Маңыздылығы','Статус','Уақыт'].map(h=>`<th class="p-3 text-left">${h}</th>`).join('')}</tr></thead><tbody class="divide-y divide-slate-100">${list.map(t=>`<tr class="hover:bg-slate-50"><td class="p-3 font-bold">${t.id}</td><td class="p-3">${esc(DORMS[t.dorm].n.split(' — ')[0])}</td><td class="p-3">№${esc(t.room)}</td><td class="p-3">${CATS[t.cat]||t.cat}</td><td class="p-3">${PRIO[t.prio]?badge(PRIO[t.prio]):''}</td><td class="p-3">${badge(ST[t.st])}</td><td class="p-3 text-slate-500">${t.time}</td></tr>`).join('')||'<tr><td colspan="7" class="p-4 text-slate-500">Өтінім жоқ</td></tr>'}</tbody></table></div>`;
+
+/* ---------- хабарлама баптаулары: Telegram ID + Email (KV, /api/admin/settings) ---------- */
+// Telegram боттың юзернеймі (@-сыз), мысалы 'OrtaqCampusBot'. Бос болса, бот батырмасы көрінбейді
+const TG_BOT='';
+const nsUni=()=>me.role==='dev'?dflt:me.dorm;
+async function nsReq(path,body){
+ try{const t=localStorage.getItem('cc_token');
+  const r=await fetch(API+path,{method:body?'POST':'GET',headers:{'Content-Type':'application/json',...(t?{Authorization:'Bearer '+t}:{})},body:body?JSON.stringify(body):undefined});
+  return await r.json();
+ }catch(e){return{ok:false,error:'Серверге қосылу мүмкін болмады. Интернетті тексеріңіз'}}
+}
+const notifPanel=()=>{
+ if(me.role==='dev'&&dflt==='all')return '<p class="text-xs text-slate-500 px-1">Хабарлама баптауларын көру үшін жоғарыдағы тізімнен нақты ЖОО-ны таңдаңыз.</p>';
+ if(me.role!=='admin'&&me.role!=='dev')return '';
+ return `<section class="bg-white rounded-2xl p-5 border border-slate-200 space-y-4">
+  <div><h3 class="font-extrabold">🔔 Хабарламаларды қабылдау баптаулары</h3><p class="text-xs text-slate-500 mt-1">Жаңа өтінім түскенде хабар осы Telegram мен поштаға келеді.</p></div>
+  <div class="grid md:grid-cols-2 gap-4">
+   <label class="block text-xs font-bold text-slate-600">Telegram ID<input id="ns-tg" inputmode="numeric" autocomplete="off" class="${F}" placeholder="512345678"><span class="block font-normal text-slate-500 mt-1">Тек сандар. ID-ді ботқа /start жазып аласыз.</span></label>
+   <label class="block text-xs font-bold text-slate-600">Email пошта<input id="ns-em" type="email" autocomplete="off" class="${F}" placeholder="admin@kbtu.kz"><span class="block font-normal text-slate-500 mt-1">Өтінімдер келетін өз поштаңыз (суретімен қоса).</span></label>
+  </div>
+  ${TG_BOT?`<a href="https://t.me/${TG_BOT}?start=1" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-sky-500 text-white text-sm font-bold">✈️ Telegram ботты ашу: ID алу (Start басыңыз)</a>`:''}
+  <details class="rounded-xl bg-slate-50 border border-slate-200 p-4 text-xs text-slate-600">
+   <summary class="font-bold cursor-pointer text-slate-700">❓ Қалай толтыру керек? (нұсқаулық)</summary>
+   <div class="mt-3 space-y-3 leading-relaxed">
+    <div><b>1. Telegram ID алу</b><ol class="list-decimal ml-5 mt-1 space-y-0.5"><li>Жоғарыдағы <b>«Telegram ботты ашу»</b> батырмасын басыңыз.</li><li>Ботта <b>Start</b> (немесе /start) басыңыз.</li><li>Бот сізге <b>сан</b> жібереді, мысалы <code>512345678</code>. Бұл сіздің ID.</li><li>Сол санды көшіріп, <b>Telegram ID</b> жолына қойыңыз.</li></ol></div>
+    <div><b>2. Email жазу</b><ol class="list-decimal ml-5 mt-1 space-y-0.5"><li>Күнде ашып тұратын өз поштаңызды жазыңыз.</li><li>Бірнеше адам қабылдағыңыз келсе, бір ортақ пошта қолданыңыз.</li></ol></div>
+    <div><b>3. Сақтап, тексеру</b><ol class="list-decimal ml-5 mt-1 space-y-0.5"><li><b>«Сақтау»</b> батырмасын басыңыз.</li><li><b>«Тест хабарлама жіберу»</b> басыңыз. Telegram мен поштаға хабар келуі керек.</li><li>Хат келмесе, <b>«Спам»</b> папкасын қараңыз.</li></ol></div>
+    <div class="text-slate-500"><b>Нәтиже:</b> Telegram ✅ болса, ботқа Start басқаныңыз дұрыс. Telegram ❌ болса, ботта Start басып, ID-ді қайта тексеріңіз. Email ❌ болса, пошта мекенжайын тексеріңіз немесе әзірлеушіге хабарласыңыз.</div>
+   </div>
+  </details>
+  <div class="flex flex-wrap gap-2"><button type="button" id="ns-save" class="px-4 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-bold">Сақтау</button><button type="button" id="ns-test" class="px-4 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-sm font-bold border border-slate-200">Тест хабарлама жіберу</button></div>
+ </section>`};
+async function initNotif(){
+ const u=nsUni(),q=me.role==='dev'?'?uni='+encodeURIComponent(u):'';
+ const r=await nsReq('/api/admin/settings'+q);
+ if(r.ok){const a=$('#ns-tg'),b=$('#ns-em');if(a)a.value=r.settings.telegram_chat_id||'';if(b)b.value=r.settings.email||''}
+ else toast(r.error||'Қате шықты','err');
+ const val=()=>({uni:u,telegram_chat_id:$('#ns-tg').value.trim(),email:$('#ns-em').value.trim()});
+ const save=async()=>{const v=val();if(v.telegram_chat_id&&!/^\d+$/.test(v.telegram_chat_id)){toast('Telegram ID тек сандардан тұруы керек','err');return false}
+  const x=await nsReq('/api/admin/settings',v);if(!x.ok){toast(x.error||'Қате шықты','err');return false}return true};
+ $('#ns-save').onclick=async()=>{if(await save())toast('Баптаулар сақталды')};
+ $('#ns-test').onclick=async()=>{
+  if(!await save())return;
+  const x=await nsReq('/api/admin/test-notification',{uni:u});
+  if(x.ok)toast('Тест хабарлама жіберілді: Telegram '+(x.tg?'✅':'❌')+' · Email '+(x.mail?'✅':'❌'));
+  else toast(x.error||'Қате шықты','err');
+ };
+}
+const adminView=()=>{
+ const base=V().filter(t=>dflt==='all'||t.dorm===dflt),list=base.filter(t=>flt==='all'||t.st===flt),c=s=>base.filter(t=>t.st===s).length;
+ return `
+<main class="max-w-[1500px] mx-auto px-4 py-6 space-y-6">
+ ${me.role==='admin'?`<div class="bg-white rounded-2xl p-4 border border-slate-200 flex flex-wrap items-center justify-between gap-3"><div class="text-xs"><div class="font-bold text-slate-700">🔑 Университетіңіздің студент коды</div><div class="text-slate-500 mt-0.5">Кодты тек өз студенттеріңізге беріңіз: код пен ЖОО поштасы болмаса, тіркелу мүмкін емес.</div></div><span class="px-4 py-2 rounded-xl bg-slate-900 text-white font-extrabold tracking-wider select-all" id="stu-code">···</span></div>`:''}
+ ${notifPanel()}
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">${kpi('Барлық өтінім',base.length,'text-slate-900')}${kpi('🔴 Ашық',(c('open')+c('received')),'text-red-600')}${kpi('🛠️ Жөнделуде',c('in_progress'),'text-amber-600')}${kpi('🟢 Жөнделді',c('resolved'),'text-emerald-600')}</div>
+ <div class="bg-white rounded-2xl p-4 border border-slate-200 flex flex-wrap items-center justify-between gap-3">
+  <select id="fd" class="${F} !w-auto !mt-0">${[...(me.role==='dev'?['all']:[]),...VD()].map(k=>`<option value="${k}"${k===dflt?' selected':''}>${k==='all'?'Барлық ЖОО':DORMS[k].n}</option>`).join('')}</select>
+  <div class="flex flex-wrap gap-2">${fb()}</div>
+  <span class="text-xs text-slate-500">Тіркелген студенттер: <b>${users.filter(u=>u.role==='student'&&(me.role==='dev'||u.dorm===me.dorm)).length}</b></span>
+ </div>
+ ${qrPanel()}
+ <div class="grid lg:grid-cols-5 gap-6">
+  <div class="lg:col-span-3 bg-white rounded-3xl p-2.5 border border-slate-200"><div id="map" style="height:clamp(320px,62vh,760px)" class="rounded-2xl"></div></div>
+  <div class="lg:col-span-2 space-y-3 lg:max-h-[560px] overflow-y-auto pr-1">${list.map(t=>card(t,1)).join('')||'<p class="text-sm text-slate-500">Бұл сүзгі бойынша өтінім жоқ.</p>'}</div>
+ </div>
+ ${tbl(list)}
+</main>`};
+
+/* ---------- беттер ---------- */
+const PAGES={student:'Өтініш беру',dorm:'Жатақхана',open:'Ашықтық және қоғамдық бақылау',map:'Карта',admin:'Әкімшілік панелі',about:'Аналитика & Жоба туралы',help:'Байланыс & Төтенше нөмірлер',dev:'🧑‍💻 Әзірлеуші'};
+const ACCESS={student:['student','dorm','open','map','help'],admin:['admin','dorm','open','student','map','about','help'],dev:['admin','dorm','open','student','map','about','help','dev']};
+const can=k=>!!me&&ACCESS[me.role].includes(k);
+const HOME={student:'student',admin:'admin',dev:'dev'};
+const nav=()=>`<nav class="hidden lg:flex max-w-[1500px] mx-auto px-4 pt-4 gap-2 overflow-x-auto">${ACCESS[me.role].map((k,i)=>`<button data-p="${k}" class="shrink-0 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold ${page===k?'bg-blue-600 text-white shadow-md shadow-blue-600/20':'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100'}">${k==='dev'?'':(i+1)+'. '}${PAGES[k]}</button>`).join('')}</nav>`;
+
+const ICON={student:'📝',dorm:'🏠',open:'🔎',map:'🗺️',admin:'🛡️',about:'📊',help:'🆘',dev:'🧑‍💻'},SHORT={student:'Өтінім',dorm:'Жатақхана',open:'Ашықтық',map:'Карта',admin:'Панель',about:'Аналитика',help:'Байланыс',dev:'Әзірл.'};
+const bottomNav=()=>`<nav class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur border-t border-slate-200" style="padding-bottom:env(safe-area-inset-bottom)"><div class="flex">${ACCESS[me.role].map(k=>`<button data-p="${k}" class="flex-1 min-w-0 py-2 flex flex-col items-center gap-0.5 text-[10px] font-bold ${page===k?'text-blue-600':'text-slate-500'}"><span class="text-lg leading-none">${ICON[k]}</span><span class="truncate max-w-full px-0.5">${SHORT[k]}</span>${page===k?'<span class="w-6 h-0.5 rounded bg-blue-600"></span>':''}</button>`).join('')}</div></nav>`;
+const sidebar=()=>`<aside class="hidden lg:flex flex-col w-64 shrink-0 sticky top-0 h-screen overflow-y-auto sb bg-gradient-to-b from-slate-900 via-slate-900 to-blue-950 text-white p-4">
+ <div class="flex items-center gap-3 px-2 py-3">${logo(40)}<div><div class="font-extrabold leading-tight">Ortaq Campus</div><div class="text-[11px] text-slate-400">${me.role==='dev'?'Super Admin':'Әкімшілік'}</div></div></div>
+ <nav class="mt-4 space-y-1">${ACCESS[me.role].map(k=>`<button data-p="${k}" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-left ${page===k?'bg-blue-600 text-white shadow-lg shadow-blue-600/30':'text-slate-300 hover:bg-white/10'}"><span class="text-lg">${ICON[k]}</span>${PAGES[k]}</button>`).join('')}</nav>
+ <div class="mt-auto pt-4"><div class="rounded-2xl bg-white/5 border border-white/10 p-3 space-y-0.5"><div class="text-xs font-bold truncate">${esc(me.name)}</div><div class="text-[11px] text-slate-400 truncate">${esc(me.email)}</div><div class="text-[11px] text-amber-400 font-bold pt-1">${me.role==='admin'?esc(DORMS[me.dorm].n):'Барлық ЖОО'}</div></div></div></aside>`;
+const shell=v=>`<div class="lg:flex min-h-screen">${me.role==='student'?'':sidebar()}<div class="flex-1 min-w-0 pb-20 lg:pb-0">${header()}${me.role==='student'?nav():''}<div class="fade">${v}</div></div></div>${bottomNav()}`;
+const art=()=>`<svg class="w-full h-auto" viewBox="0 0 320 200" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="40" y="70" width="150" height="120" rx="8" fill="#1e3a8a"/><rect x="190" y="105" width="90" height="85" rx="8" fill="#312e81"/>${[0,1,2].map(r=>[0,1,2,3,4].map(c=>`<rect x="${54+c*27}" y="${84+r*26}" width="16" height="16" rx="3" fill="${r===1&&c===2?'#ef4444':r===2&&c===0?'#10b981':'#93c5fd'}" opacity="${(r+c)%3?0.9:0.55}"/>`).join('')).join('')}${[0,1,2].map(r=>[0,1,2].map(c=>`<rect x="${203+c*26}" y="${118+r*22}" width="14" height="14" rx="3" fill="#a5b4fc" opacity="0.7"/>`).join('')).join('')}<rect x="104" y="160" width="22" height="30" rx="3" fill="#0f172a"/><path d="M118 8c-16 0-28 12-28 27 0 20 28 40 28 40s28-20 28-40c0-15-12-27-28-27z" fill="#ef4444"/><circle cx="118" cy="35" r="10" fill="#fff"/><path d="M10 190h300" stroke="#64748b" stroke-width="3" stroke-linecap="round"/></svg>`;
+const fb=()=>[['all','Барлығы'],['open','🔴 Ашық'],['received','📥 Қабылданды'],['in_progress','🛠️ Жөнделуде'],['resolved','🟢 Жөнделді']].map(([k,l])=>`<button data-f="${k}" class="px-3 py-2 rounded-xl text-xs font-extrabold ${flt===k?'bg-slate-900 text-white':'bg-slate-100 text-slate-700 hover:bg-slate-200'}">${l}</button>`).join('');
+async function setSt(id,st){const t=tickets.find(x=>x.id===id);if(!t)return;const r=await api('/tickets/update',{id,st,tech:st==='in_progress'&&!t.tech?TECH[t.cat]:undefined});if(!r.ok)return toast(r.error||'Қате шықты','err');upd(r.ticket);render()}
+const mapView=()=>{const ls=V().filter(t=>(flt==='all'||t.st===flt)&&(DORMS[t.dorm].n+t.room).toLowerCase().includes(q));return `
+<main class="max-w-[1500px] mx-auto px-4 py-6 space-y-5">
+ <div class="bg-white rounded-2xl p-4 border border-slate-200 flex flex-wrap items-center justify-between gap-3"><div class="flex flex-wrap items-center gap-2">${fb()}<span id="geo-s" class="text-xs font-bold px-3 py-1.5 rounded-full border bg-amber-50 text-amber-700 border-amber-200">⏳ Геолокация…</span><button type="button" id="geo-b" class="hidden px-3 py-1.5 rounded-xl bg-blue-600 text-white text-xs font-extrabold">📍 Қайта сұрау</button></div><input id="qs" value="${esc(q)}" placeholder="Университет немесе бөлме..." class="${F} !w-64 !mt-0"></div>
+ <div class="grid lg:grid-cols-12 gap-5">
+  <div class="lg:col-span-4 bg-white rounded-3xl p-4 border border-slate-200 space-y-2.5 lg:max-h-[620px] overflow-y-auto">${ls.map(t=>`<div class="p-3 rounded-2xl border ${t.st==='resolved'?'border-emerald-200 bg-emerald-50/40':'border-red-200 bg-red-50/40'}"><div class="flex items-center justify-between">${badge(ST[t.st])}<span class="text-[11px] font-bold text-slate-400">${t.time}</span></div><div class="font-bold text-xs mt-1.5">${DORMS[t.dorm].n}</div><div class="text-xs font-extrabold text-blue-600">№${esc(t.room)}</div><p class="text-[11px] text-slate-600 mt-1">${esc(t.desc)}</p></div>`).join('')||'<p class="text-sm text-slate-500">Ештеңе табылмады.</p>'}</div>
+  <div class="lg:col-span-8 bg-white p-2.5 rounded-3xl border border-slate-200"><div id="map" style="height:clamp(340px,72vh,860px)" class="rounded-2xl"></div></div>
+ </div>
+</main>`};
+const aboutView=()=>`
+<main class="max-w-[1500px] mx-auto px-4 py-6 space-y-6">
+ <section class="relative overflow-hidden rounded-3xl p-6 sm:p-8 text-white bg-gradient-to-r from-indigo-600 to-blue-700">
+  <div class="relative z-10 max-w-2xl"><h2 class="text-2xl sm:text-3xl font-extrabold">Ortaq Campus — Алматы ЖОО инфрақұрылымын цифрландыру</h2><p class="text-sm text-blue-100 mt-2">Жоба студенттер мен әкімшілік арасындағы ақпараттық алшақтықты жояды: ақауды анықтау уақыты 3 күннен 15 секундқа дейін қысқарады.</p></div>
+  <div class="absolute -right-4 bottom-0 w-72 opacity-25 sm:opacity-60">${art()}</div>
+ </section>
+ <div class="grid lg:grid-cols-2 gap-6">
+  <div class="bg-white p-6 rounded-3xl border border-slate-200"><h3 class="font-bold mb-4">Ақау санаттары бойынша үлес</h3><div style="height:260px"><canvas id="c1"></canvas></div></div>
+  <div class="bg-white p-6 rounded-3xl border border-slate-200"><h3 class="font-bold mb-4">ЖОО бойынша жөндеу тиімділігі</h3><div style="height:260px"><canvas id="c2"></canvas></div></div>
+ </div>
+ <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">${[['QR-кодты сканерлеу','Студент есіктегі QR-ды сканерлеп, фото мен сипаттама жібереді.','bg-blue-100 text-blue-700'],['Картада ҚЫЗЫЛ белгі','Әкімшілікке хабар түсіп, картада қызыл белгі жанады.','bg-red-100 text-red-700'],['Шеберге тапсырма','Жауапты маман тағайындалып, ақауды жөндейді.','bg-amber-100 text-amber-700'],['ЖАСЫЛ белгі және есеп','Жөнделген фото жүктелген соң белгі жасылға ауысады.','bg-emerald-100 text-emerald-700']].map(([t,d,c],i)=>`<div class="bg-white p-5 rounded-2xl border border-slate-200 space-y-2"><div class="w-10 h-10 rounded-xl font-extrabold flex items-center justify-center ${c}">0${i+1}</div><h4 class="font-bold text-sm">${t}</h4><p class="text-xs text-slate-500">${d}</p></div>`).join('')}</div>
+
+ <section class="bg-white p-6 rounded-3xl border border-slate-200 space-y-4"><div><h3 class="font-bold text-lg">Жатақхана ережелері</h3><p class="text-xs text-slate-500">Үлгі ережелер: әр ЖОО өз ережесін қолданады.</p></div>
+  <div class="grid md:grid-cols-2 gap-4 text-xs text-slate-600">${[['🕒 Тыныштық сағаттары','23:00-ден 07:00-ге дейін тыныштық сақталады, басқа студенттердің демалысына кедергі келтіруге болмайды.'],['📍 Геолокация бақылауы','Жалған өтінімдердің алдын алу үшін ақауды жатақхана аумағында жүрген студент қана тіркей алады.'],['🔥 Өрт және электр қауіпсіздігі','Бөлмеде қолдан жасалған жылытқышты, ашық отты қолдануға және бөгде адамдарды рұқсатсыз кіргізуге болмайды.'],['🪪 ЖОО верификациясы','Студент тек өз университетінің корпоративтік поштасымен және университет коды арқылы тіркеле алады. Әркім тек өз университетінің деректерін көреді.']].map(([t,d])=>`<div class="p-4 rounded-2xl bg-slate-50 border border-slate-100"><b class="text-blue-600">${t}</b><p class="mt-1 leading-relaxed">${d}</p></div>`).join('')}</div></section>
+</main>`;
+function charts(){if(typeof Chart==='undefined')return;const cs=Object.keys(CATS),ks=VD();
+ new Chart($('#c1'),{type:'doughnut',data:{labels:cs.map(k=>CATS[k]),datasets:[{data:cs.map(k=>V().filter(t=>t.cat===k).length),backgroundColor:['#2563eb','#0ea5e9','#f59e0b','#8b5cf6','#10b981'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right'}}}});
+ new Chart($('#c2'),{type:'bar',data:{labels:ks.map(k=>DORMS[k].n.split(' — ')[0]),datasets:[{label:'Жөнделді',data:ks.map(k=>V().filter(t=>t.dorm===k&&t.st==='resolved').length),backgroundColor:'#10b981',borderRadius:8},{label:'Белсенді',data:ks.map(k=>V().filter(t=>t.dorm===k&&t.st!=='resolved').length),backgroundColor:'#ef4444',borderRadius:8}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,ticks:{precision:0}}}}})}
+
+/* ---------- байланыс және төтенше нөмірлер ---------- */
+const EMG=[['112','Бірыңғай құтқару қызметі','bg-red-600'],['102','Полиция','bg-blue-700'],['103','Жедел жәрдем','bg-emerald-600'],['101','Өрт сөндіру қызметі','bg-orange-600'],['104','Газ апаттық қызметі','bg-amber-600'],['110','ҰҚК сенім телефоны','bg-slate-700'],['1402','ІІМ бірыңғай сенім телефоны','bg-slate-700'],['115','Бас прокуратура (call-орталық)','bg-slate-700'],['1424','Сыбайлас жемқорлыққа қарсы қызмет (Антикор)','bg-slate-700'],['111','Отбасы, әйелдер мен балаларға көмек','bg-pink-600'],['150','Психологиялық көмек','bg-violet-600']];
+const cform=(k,title)=>{const c=contacts[k]||CONTACTS[k]||{},ed=me.role==='dev'||(me.role==='admin'&&k===me.dorm),L={name:'Аты-жөні',phone:'Телефон',email:'Email'};
+ return `<div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-2"><h3 class="font-bold text-sm">${title}</h3>${ed?Object.keys(L).map(f=>`<label class="block text-[11px] font-bold text-slate-500">${L[f]}<input id="c-${f}-${k}" value="${esc(c[f]||'')}" class="${F} !py-2"></label>`).join('')+`${k!=='dev'?`<label class="block text-[11px] font-bold text-slate-500">Жатақхана / университет туралы ақпарат (ережелер, жұмыс уақыты, құжаттар)<textarea id="c-about-${k}" rows="4" maxlength="2000" class="${F} !py-2">${esc(c.about||'')}</textarea></label>`:''}<button data-sc="${k}" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold">Сақтау</button>`:`<div class="text-sm space-y-1"><div class="font-semibold">${esc(c.name||'Әлі көрсетілмеген')}</div>${c.phone?`<a class="block text-blue-600 font-bold" href="tel:${esc(c.phone)}">📞 ${esc(c.phone)}</a>`:''}${c.email?`<a class="block text-blue-600 font-bold" href="mailto:${esc(c.email)}">✉️ ${esc(c.email)}</a>`:''}${c.about?`<div class="pt-2 text-xs text-slate-600 whitespace-pre-wrap">${esc(c.about)}</div>`:''}</div>`}${k==='dev'?`<a class="block text-blue-600 font-bold text-sm" href="https://t.me/Seidakanov" target="_blank" rel="noopener">✈️ Telegram: @Seidakanov</a>`:''}</div>`};
+const helpView=()=>`<main class="max-w-[1500px] mx-auto px-4 py-6 space-y-6">
+ <section class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm"><h2 class="font-bold text-xl">🆘 Төтенше және құқық қорғау нөмірлері</h2><p class="text-xs text-slate-500 mt-1">Нөмірді басыңыз, қоңырау шалынады. Қауіп төніп тұрса, алдымен 112-ге қоңырау шалыңыз.</p>
+ <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-4">${EMG.map(([n,l,c])=>`<a href="tel:${n}" class="flex items-center gap-3 p-3 rounded-2xl border border-slate-200 hover:bg-slate-50"><span class="shrink-0 min-w-[3.5rem] text-center px-2 py-2 rounded-xl text-white font-extrabold ${c}">${n}</span><span class="text-xs font-bold text-slate-700">${l}</span></a>`).join('')}</div></section>
+ <section><h2 class="font-bold text-lg mb-3">Байланыс</h2><div class="grid md:grid-cols-2 gap-4">${cform('dev','🧑‍💻 Әзірлеуші')}${VD().map(k=>cform(k,'🛡️ Әкімшілік: '+DORMS[k].n)).join('')}</div></section></main>`;
+
+/* ---------- әзірлеуші мәзірі ---------- */
+const ROLE={student:'🎓 Студент',admin:'🛡️ Әкімші',dev:'🧑‍💻 Әзірлеуші'};
+const devTools=()=>`
+<section class="max-w-[1500px] mx-auto px-4 pt-6 space-y-4">
+ <div class="rounded-3xl p-5 bg-slate-900 text-white space-y-3">
+  <h2 class="font-bold text-lg">🧑‍💻 Әзірлеуші мәзірі</h2>
+  <p class="text-xs text-slate-300">Кез келген қолданушы ретінде кіріп, студент пен әкімші беттерін тексеріңіз. Өтінім статусын «Әкімшілік панелі» бетінде кез келген мәнге өзгерте аласыз.</p>
+  <div class="flex flex-wrap gap-2 text-xs font-extrabold">${[['dd-s','👤 Демо студент қосу'],['dd-a','🛡️ Демо әкімші қосу'],['dr','♻️ Өтінімдерді қалпына келтіру'],['dc','🗑️ Өзімнен басқаларды өшіру'],['dn','📨 Telegram тест'],['dx','⬇️ JSON көшірме']].map(([i,l])=>`<button id="${i}" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20">${l}</button>`).join('')}</div>
+ </div>
+ <div class="bg-white rounded-2xl border border-slate-200 overflow-x-auto"><table class="w-full text-xs">
+  <thead class="bg-slate-50 text-slate-500"><tr><th class="p-3 text-left">Аты</th><th class="p-3 text-left">Email</th><th class="p-3 text-left">Рөл</th><th class="p-3 text-left">Жатақхана</th><th></th></tr></thead>
+  <tbody class="divide-y divide-slate-100">${users.map(u=>`<tr><td class="p-3 font-bold">${esc(u.name)}</td><td class="p-3">${esc(u.email)}</td><td class="p-3">${ROLE[u.role]}</td><td class="p-3">${DORMS[u.dorm].n}</td><td class="p-3 text-right whitespace-nowrap">${u.email===me.email?'<span class="text-slate-400">Сіз</span>':`<button data-as-u="${esc(u.email)}" class="px-2.5 py-1.5 rounded-lg bg-blue-50 text-blue-700 font-extrabold">Осы ретінде кіру</button> <button data-del-u="${esc(u.email)}" class="px-2.5 py-1.5 rounded-lg bg-red-50 text-red-700 font-extrabold">Өшіру</button>`}</td></tr>`).join('')}</tbody>
+ </table></div>
+</section>`;
+async function demo(role){const e=role+'@demo.kz';if(users.some(u=>u.email===e))return toast('Бұл демо қолданушы бар','err');users.push({name:role==='admin'?'Демо әкімші':'Демо студент',email:e,h:await H('demo123'),role,dorm:'kaznpu',room:role==='admin'?'':'213'});save();render();toast('Демо қолданушы қосылды: «Осы ретінде кіру» батырмасы арқылы ашыңыз')}
+
+/* ---------- карта (екі бетте де) ---------- */
+/* ---------- карта: Yandex Maps (кілт болса) немесе Leaflet ---------- */
+function mapItems(){
+ const adm=me.role!=='student',it=[],n={};
+ (page==='map'||(adm&&dflt==='all')?VD():adm?[dflt]:[me.dorm]).forEach(k=>{const d=DORMS[k];it.push({p:d.p,camp:1,y:'islands#blueIcon',pop:`<b>${d.n}</b><br>${d.a}`})});
+ (page==='map'?V().filter(t=>(flt==='all'||t.st===flt)&&(DORMS[t.dorm].n+t.room).toLowerCase().includes(q)):adm?tickets.filter(t=>(dflt==='all'||t.dorm===dflt)&&(flt==='all'||t.st===flt)):tickets.filter(t=>t.by===me.email)).forEach(t=>{
+  const d=DORMS[t.dorm],i=n[t.dorm]=(n[t.dorm]||0)+1,c={open:['r','!'],received:['o','📥'],in_progress:['a','🛠'],resolved:['g','✓']}[t.st]||['a','🛠'];
+  it.push({p:t.lat!=null?[t.lat,t.lng]:[d.p[0]+i*0.0004,d.p[1]+i*0.0004],y:YP[c[0]],h:`<div class="pin ${c[0]}">${c[1]}</div>`,pop:`<b>${d.n}</b><br>№${esc(t.room)} • ${ST[t.st][0]}<br>${esc(t.desc)}`});
+ });
+ return it;
+}
+function drawLeaflet(el,it){
+ if(typeof L==='undefined'){el.innerHTML='<div class="h-full flex items-center justify-center p-6 text-center text-sm text-slate-500">Карта жүктелмеді. Интернетті тексеріп, бетті жаңартыңыз.</div>';return}
+ map=L.map(el,{center:[43.2389,76.925],zoom:12});
+ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap',maxZoom:19}).addTo(map);
+ layer=L.layerGroup().addTo(map);
+ it.forEach(x=>(x.camp?L.circleMarker(x.p,{radius:8,color:'#1d4ed8',weight:3,fillColor:'#fff',fillOpacity:1}):L.marker(x.p,{icon:L.divIcon({className:'',html:x.h,iconSize:[30,30],iconAnchor:[15,15]})})).bindPopup(x.pop).addTo(layer));
+ map.fitBounds(it.map(x=>x.p),{padding:[40,40],maxZoom:16});
+ setTimeout(()=>map&&map.invalidateSize&&map.invalidateSize(),250);showMe();
+}
+let ymLoad=null;
+const YP={r:'islands#redCircleDotIcon',o:'islands#orangeCircleDotIcon',a:'islands#yellowCircleDotIcon',g:'islands#greenCircleDotIcon'};
+const loadYM=()=>ymLoad||(ymLoad=new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://api-maps.yandex.ru/2.1/?apikey='+encodeURIComponent(YMAPS_KEY)+'&lang=ru_RU';s.onload=()=>ymaps.ready(ok);s.onerror=()=>{ymLoad=null;no(new Error('Yandex script'))};setTimeout(()=>no(new Error('timeout')),12000);document.head.appendChild(s)}));
+async function initYMap(el,it){
+ el.innerHTML='<div class="h-full flex items-center justify-center text-sm text-slate-400">Карта жүктелуде…</div>';
+ await loadYM();
+ if(!el.isConnected)return;
+ el.innerHTML='';
+ const m=new ymaps.Map(el,{center:[43.2389,76.925],zoom:12,controls:['zoomControl','geolocationControl']},{suppressMapOpenBlock:true});
+ map=m;
+ it.forEach(x=>m.geoObjects.add(new ymaps.Placemark(x.p,{balloonContent:x.pop},{preset:x.y})));
+ m.setBounds(m.geoObjects.getBounds(),{checkZoomRange:true,zoomMargin:50}).then(()=>{if(m.getZoom()>16)m.setZoom(16)});showMe();
+}
+function initMap(){
+ const el=$('#map');if(!el)return;
+ const it=mapItems();
+ if(YMAPS_KEY)initYMap(el,it).catch(()=>{if(el.isConnected){el.innerHTML='';drawLeaflet(el,it)}});else drawLeaflet(el,it);
+}
+
+/* ---------- рендер және оқиғалар ---------- */
+
+/* ---------- Жатақханаға өтініш беру модулі ---------- */
+const DST={submitted:['Жіберілді','bg-slate-100 text-slate-700'],under_review:['Әкімшілік тексеруінде','bg-blue-100 text-blue-700'],need_docs:['Қосымша құжат қажет','bg-amber-100 text-amber-700'],committee:['Комиссия қарауында','bg-violet-100 text-violet-700'],accepted:['Қабылданды','bg-emerald-100 text-emerald-700'],reserve:['Резервтік кезек','bg-cyan-100 text-cyan-700'],rejected:['Бас тартылды','bg-red-100 text-red-700'],appeal:['Апелляцияда','bg-orange-100 text-orange-700']};
+const DCAT={orphan:'Жетім студент',no_guardian:'Ата-анасының қамқорлығынсыз қалған студент',disability:'Мүгедектігі бар студент',large_family:'Көпбалалы отбасынан шыққан студент',social_aid:'Әлеуметтік көмек алатын отбасы',kandas:'Қандас мәртебесі',other:'Басқа заңды басымдық санаты'};
+let dapps=[],dKey=null,dstep=1,dform={},dflt2='all';
+const dEsc=x=>String(x==null?'':x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fdate=x=>x?new Date(String(x).replace(' ','T')+'Z').toLocaleString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'';
+const dBadge=x=>`<span class="px-2.5 py-1 rounded-full text-[11px] font-extrabold ${DST[x][1]}">${DST[x][0]}</span>`;
+const dHist=a=>`<ol class="mt-2 space-y-2 border-l-2 border-slate-200 pl-4">${a.history.map(h=>`<li class="text-xs"><div class="font-bold text-slate-700">${DST[h.to]?DST[h.to][0]:h.to} <span class="font-normal text-slate-400">• ${fdate(h.at)}</span></div>${h.reason?`<div class="text-slate-500">${dEsc(h.reason)}</div>`:''}</li>`).join('')}</ol>`;
+const dCard='rounded-3xl bg-white border border-slate-200 shadow-sm p-5 sm:p-6';
+const dBtn='px-4 py-2.5 rounded-xl text-xs font-bold ';
+async function loadD(){const r=await api(me.role==='student'?'/dorm/mine':'/dorm/list',{});if(r.ok){dapps=r.apps;render()}else toast(r.error||'Қате шықты','err')}
+const dormView=()=>{if(dKey!==me.id){dKey=me.id;dapps=[];loadD()}return me.role==='student'?dormStudent():dormAdmin()};
+const dForm=()=>{const f=dform,v=k=>dEsc(f[k]||'');
+ if(f.name===undefined)f.name=me.name||'';if(f.email===undefined)f.email=me.email||'';
+ const steps=['Студент','Тұрғын үй','Әлеуметтік жағдай','Растау'];
+ const bar=`<div class="grid grid-cols-4 gap-1 mb-4">${steps.map((t,i)=>`<div class="text-center text-[10px] sm:text-[11px] font-bold py-1.5 px-1 rounded-lg ${dstep===i+1?'bg-blue-600 text-white':dstep>i+1?'bg-emerald-100 text-emerald-700':'bg-slate-100 text-slate-500'}">${i+1}. ${t}</div>`).join('')}</div>`;
+ let b='';
+ if(dstep===1)b=`<div class="grid sm:grid-cols-2 gap-3">${inp('d_name','Аты-жөні','text','required value="'+v('name')+'"')}
+  <div class="block text-xs font-bold text-slate-600">Университет<div class="${F} bg-slate-50">${dEsc((DORMS[me.dorm]||{}).n||'')}</div></div>
+  ${inp('d_faculty','Факультет','text','required value="'+v('faculty')+'"')}${inp('d_major','Мамандығы','text','required value="'+v('major')+'"')}
+  <label class="block text-xs font-bold text-slate-600">Курс<select id="d_course" class="${F}">${[1,2,3,4,5,6].map(n=>`<option ${String(f.course||1)===String(n)?'selected':''}>${n}</option>`).join('')}</select></label>
+  ${inp('d_phone','Телефон','tel','required placeholder="+7 7xx xxx xxxx" value="'+v('phone')+'"')}${inp('d_email','Email','email','required value="'+v('email')+'"')}</div>`;
+ if(dstep===2)b=`<div class="grid sm:grid-cols-2 gap-3">${inp('d_addr','Тұрақты мекенжай','text','required value="'+v('addr')+'"')}${inp('d_region','Қай өңірден келгені','text','required value="'+v('region')+'"')}
+  <label class="block text-xs font-bold text-slate-600">Алматыда тұрғын үйіңіз бар ма?<select id="d_housing" class="${F}"><option value="0" ${f.housing!=='1'?'selected':''}>Жоқ</option><option value="1" ${f.housing==='1'?'selected':''}>Бар</option></select></label></div>
+  <label class="block text-xs font-bold text-slate-600 mt-3">Жатақханаға мұқтаждық себебі (кемінде 10 таңба)<textarea id="d_reason" rows="4" class="${F}">${v('reason')}</textarea></label>`;
+ if(dstep===3)b=`<div id="d_cats" class="space-y-2"><div class="text-xs font-bold text-slate-600">Әлеуметтік санаттар (бар болса белгілеңіз)</div>${Object.keys(DCAT).map(k=>`<label class="flex items-start gap-2 text-sm"><input type="checkbox" data-cat="${k}" ${(f.cats||[]).includes(k)?'checked':''} class="mt-1">${DCAT[k]}</label>`).join('')}<div class="text-[11px] text-slate-500 pt-1">Санаттар кейін құжатпен расталады.</div></div>`;
+ if(dstep===4)b=`<div class="space-y-3 text-sm"><label class="flex items-start gap-2"><input type="checkbox" id="d_c1" ${f.c1?'checked':''} class="mt-1">Мен дербес деректерімді өңдеуге келісім беремін</label><label class="flex items-start gap-2"><input type="checkbox" id="d_c2" ${f.c2?'checked':''} class="mt-1">Мәліметтердің дұрыстығын растаймын</label></div>`;
+ return `<section class="${dCard}"><h3 class="text-base font-extrabold mb-3">Жаңа өтініш</h3>${bar}${b}<div class="flex justify-between mt-5">${dstep>1?`<button id="d_back" class="${dBtn}bg-white border border-slate-200 text-slate-700">← Артқа</button>`:'<span></span>'}${dstep<4?`<button id="d_next" class="${dBtn}bg-blue-600 text-white">Әрі қарай →</button>`:`<button id="d_submit" class="${dBtn}bg-emerald-600 text-white">Өтінімді жіберу</button>`}</div></section>`};
+const dormStudent=()=>{const has=dapps.some(a=>a.status!=='rejected');
+ return `<main class="max-w-[900px] mx-auto px-4 py-6 space-y-6"><section class="${dCard}"><h2 class="text-xl font-extrabold">🏠 Жатақханаға өтініш беру</h2><p class="text-xs text-slate-500 mt-1">Өтінім әкімшілікке түседі, шешім ашық ережелермен қабылданады, әр өзгеріс төменде тарихта көрінеді.</p></section>
+ ${dapps.map(a=>`<section class="${dCard}"><div class="flex flex-wrap items-center justify-between gap-2"><div><div class="text-xs text-slate-500">Өтініш нөмірі</div><div class="text-lg font-extrabold">${dEsc(a.id)}</div><div class="text-xs text-slate-500">${fdate(a.created)}</div></div>${dBadge(a.status)}</div>${a.note?`<div class="mt-3 rounded-xl bg-amber-50 border border-amber-200 p-3 text-xs"><b>Әкімшілік түсіндірмесі:</b> ${dEsc(a.note)}</div>`:''}<h3 class="mt-4 text-sm font-extrabold">Мәртебе тарихы</h3>${dHist(a)}</section>`).join('')}
+ ${has?'':dForm()}</main>`};
+const dormAdmin=()=>{const list=dapps.filter(a=>dflt2==='all'||a.status===dflt2),sts=me.role==='dev'?Object.keys(DST):['under_review','need_docs','committee'];
+ return `<main class="max-w-[1100px] mx-auto px-4 py-6 space-y-4"><section class="${dCard}"><h2 class="text-xl font-extrabold">🏠 Жатақхана өтініштерін басқару</h2><p class="text-xs text-slate-500 mt-1">Қабылдау, резервтік кезек және бас тарту шешімін комиссия қабылдайды. Мәртебені негіздемесіз өзгертуге болмайды.</p>
+ <div class="flex flex-wrap gap-2 mt-3"><button data-dflt="all" class="${dBtn}${dflt2==='all'?'bg-blue-600 text-white':'bg-white border border-slate-200'}">Барлығы (${dapps.length})</button>${Object.keys(DST).map(k=>`<button data-dflt="${k}" class="${dBtn}${dflt2===k?'bg-blue-600 text-white':'bg-white border border-slate-200'}">${DST[k][0]} (${dapps.filter(a=>a.status===k).length})</button>`).join('')}</div></section>
+ ${list.length?list.map(a=>`<details class="${dCard}"><summary class="cursor-pointer flex flex-wrap items-center justify-between gap-2"><span><b>${dEsc(a.id)}</b> • ${dEsc(a.name)} <span class="text-xs text-slate-500">• ${dEsc(DORMS[a.uni]?DORMS[a.uni].n:a.uni)}</span></span>${dBadge(a.status)}</summary>
+ <div class="mt-4 grid sm:grid-cols-2 gap-2 text-xs"><div><b>Факультет:</b> ${dEsc(a.faculty)}</div><div><b>Мамандығы:</b> ${dEsc(a.major)}</div><div><b>Курс:</b> ${dEsc(a.course)}</div><div><b>Телефон:</b> ${dEsc(a.phone)}</div><div><b>Email:</b> ${dEsc(a.email)}</div><div><b>Мекенжай:</b> ${dEsc(a.address)}</div><div><b>Өңір:</b> ${dEsc(a.region)}</div><div><b>Тұрғын үйі бар:</b> ${a.housing?'Иә':'Жоқ'}</div></div>
+ <div class="mt-2 text-xs"><b>Себеп:</b> ${dEsc(a.reason)}</div><div class="mt-1 text-xs"><b>Санаттар:</b> ${a.categories.length?a.categories.map(k=>DCAT[k]||k).join(', '):'—'}</div>
+ <h3 class="mt-4 text-sm font-extrabold">Мәртебе тарихы</h3>${dHist(a)}
+ <div class="mt-4 flex flex-wrap gap-2 items-end"><label class="text-xs font-bold text-slate-600">Мәртебені өзгерту<select id="dto_${a.id}" class="${F}">${sts.filter(k=>k!==a.status).map(k=>`<option value="${k}">${DST[k][0]}</option>`).join('')}</select></label><label class="text-xs font-bold text-slate-600 flex-1 min-w-[200px]">Негіздеме (міндетті)<input id="drs_${a.id}" class="${F}"></label><button data-dst="${a.id}" class="${dBtn}bg-blue-600 text-white">Сақтау</button></div></details>`).join(''):`<section class="${dCard} text-sm text-slate-500">Өтінімдер жоқ.</section>`}</main>`};
+const dCollect=()=>{['name','faculty','major','course','phone','email','addr','region','housing','reason'].forEach(k=>{const e=$('#d_'+k);if(e)dform[k]=e.value.trim()});if($('#d_cats'))dform.cats=[...$$('[data-cat]')].filter(c=>c.checked).map(c=>c.dataset.cat);if($('#d_c1')){dform.c1=$('#d_c1').checked;dform.c2=$('#d_c2').checked}};
+setInterval(async()=>{if(!me||me.role==='student')return;const a=document.activeElement;if(a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName))return;let r;try{r=await api('/dorm/list',{})}catch(e){return}if(!r||!r.ok)return;if(dKey!==me.id){dKey=me.id;dapps=r.apps;return}const sg=x=>x.map(y=>y.id+y.status).join();if(sg(r.apps)===sg(dapps))return;if(r.apps.length>dapps.length)toast('🔔 Жаңа өтініш: '+r.apps[0].id);dapps=r.apps;if(page==='dorm')render()},30000);
+function dormBind(){if(!me||page!=='dorm')return;
+ const nx=$('#d_next'),bk=$('#d_back'),sb=$('#d_submit');
+ if(nx)nx.onclick=()=>{dCollect();const f=dform,bad=dstep===1?(!f.name||!f.faculty||!f.major||!f.phone||!f.email):dstep===2?(!f.addr||!f.region||(f.reason||'').length<10):false;if(bad)return toast('Барлық жолдарды толтырыңыз (себеп кемінде 10 таңба)','err');dstep++;render()};
+ if(bk)bk.onclick=()=>{dCollect();dstep--;render()};
+ if(sb)sb.onclick=async()=>{dCollect();if(!dform.c1||!dform.c2)return toast('Келісім мен растауды белгілеңіз','err');sb.disabled=true;const f=dform;const r=await api('/dorm/apply',{name:f.name,faculty:f.faculty,major:f.major,course:f.course||'1',phone:f.phone,email:f.email,address:f.addr,region:f.region,housing:f.housing==='1',reason:f.reason,categories:f.cats||[],consent:true,confirm:true});sb.disabled=false;if(!r.ok)return toast(r.error||'Қате шықты','err');dapps.unshift(r.app);dform={};dstep=1;render();toast('Өтініш жіберілді: '+r.app.id)};
+ $$('[data-dst]').forEach(b=>b.onclick=async()=>{const id=b.dataset.dst,to=$('#dto_'+id).value,reason=$('#drs_'+id).value.trim();if(reason.length<5)return toast('Негіздеме жазыңыз','err');const r=await api('/dorm/status',{id,to,reason});if(!r.ok)return toast(r.error||'Қате шықты','err');dapps=dapps.map(a=>a.id===id?r.app:a);render();toast('Мәртебе өзгертілді')});
+ $$('[data-dflt]').forEach(b=>b.onclick=()=>{dflt2=b.dataset.dflt;render()})}
+
+/* ---------- Ашықтық және қоғамдық бақылау (жеке деректерсіз, тек жалпы сандар) ---------- */
+let dstats=null,dsTried=false;
+async function loadS(){dsTried=true;try{const r=await api('/dorm/stats',{});if(r.ok){dstats=r;render()}}catch(e){}}
+const dStatsHtml=()=>{if(!dsTried)loadS();
+ if(!dstats)return `<div class="text-sm text-slate-500">…</div>`;
+ const rows=dstats.rows||[],sum=f=>rows.filter(f).reduce((a,x)=>a+x.n,0),tot=sum(()=>true),acc=sum(x=>x.status==='accepted'),res=sum(x=>x.status==='reserve'),rej=sum(x=>x.status==='rejected'),prog=tot-acc-res-rej;
+ const card=(l,v,c)=>`<div class="rounded-2xl border border-slate-200 bg-white p-4 text-center"><div class="text-2xl font-extrabold ${c}">${v}</div><div class="text-[11px] font-bold text-slate-500 mt-1">${l}</div></div>`;
+ const cap=dstats.capacity||{};
+ const trs=Object.keys(DORMS).map(u=>{const f=st=>rows.filter(x=>x.uni===u&&(!st||x.status===st)).reduce((a,x)=>a+x.n,0),pl=cap[u],fr=pl>0?Math.max(pl-f('accepted'),0):'—';return `<tr class="border-t border-slate-100"><td class="py-2 pr-2 font-bold">${dEsc(DORMS[u].n)}</td><td class="text-center">${f()}</td><td class="text-center text-emerald-700">${f('accepted')}</td><td class="text-center text-cyan-700">${f('reserve')}</td><td class="text-center text-red-700">${f('rejected')}</td><td class="text-center">${fr}</td></tr>`}).join('');
+ return `<div class="grid grid-cols-2 sm:grid-cols-5 gap-3">${card('Жалпы өтініш саны',tot,'text-slate-800')}${card('Қанағаттандырылған өтініштер',acc,'text-emerald-600')}${card('Резервтік кезек',res,'text-cyan-600')}${card('Бас тартылған өтініштер',rej,'text-red-600')}${card('Қарау үстінде',prog,'text-blue-600')}</div>
+ <div class="overflow-x-auto mt-4"><table class="w-full text-xs"><thead><tr class="text-slate-500"><th class="text-left py-2">Университет</th><th>Барлығы</th><th>Қабылданды</th><th>Резерв</th><th>Бас тартылды</th><th>Бос орын</th></tr></thead><tbody>${trs}</tbody></table></div>`};
+const dStatsBlock=()=>`<section class="max-w-6xl mx-auto px-4 py-10"><h2 class="text-2xl font-extrabold text-center mb-1">Жатақханаға өтініштер: ашық статистика</h2><p class="text-xs text-slate-500 text-center mb-5">Тек жалпы сандар көрсетіледі. Студенттердің жеке деректері ешқашан жарияланбайды.</p>${dStatsHtml()}</section>`;
+const openView=()=>`<main class="max-w-[1100px] mx-auto px-4 py-6 space-y-6"><section class="${dCard}"><h2 class="text-xl font-extrabold">🔎 Ашықтық және қоғамдық бақылау</h2><p class="text-xs text-slate-500 mt-1">Жатақхана орындарын бөлудің ашықтығын қамтамасыз ету үшін жалпы статистика жарияланады. ЖСН, телефон, мекенжай және әлеуметтік құжаттар ешқашан көрсетілмейді.</p><div class="mt-4">${dStatsHtml()}</div></section>
+ <section class="${dCard}"><h3 class="text-sm font-extrabold mb-2">Бөлу критерийлері</h3><p class="text-xs text-slate-600">Комиссия бекіткен критерийлер мен жеке деректерден тазартылған хаттамалар осы жерде жарияланады.</p></section></main>`;
+function render(){const a=$('#ai');if(a)a.classList.toggle('hidden',!me);if(map){try{map.remove?map.remove():map.destroy()}catch(e){}map=null}meMk=null;if(pmap){try{pmap.remove()}catch(e){}}pmap=pMk=pCirc=uMk=null;if(me&&me.role==='admin')dflt=me.dorm;if(me&&!can(page))page=HOME[me.role];$('#app').innerHTML=me?shell(({student:studentView,dorm:dormView,open:openView,map:mapView,admin:adminView,about:aboutView,dev:devTools,help:helpView})[page]()):(landing?landingView():authView());bind();dormBind()}
+function bind(){
+ if(me&&$('#ns-save'))initNotif();
+ if(me&&$('#stu-code'))api('/auth/code').then(r=>{const e=$('#stu-code');if(e)e.textContent=r.ok&&r.code?r.code:'—'});
+ if(!me){
+  if(landing){$$('[data-go]').forEach(b=>b.onclick=()=>{mode=b.dataset.go;preDorm=b.dataset.d||'';landing=false;render();scrollTo(0,0)});return}
+  if($('#to-land'))$('#to-land').onclick=()=>{landing=true;render();scrollTo(0,0)};
+  $$('[data-m]').forEach(b=>b.onclick=()=>{mode=b.dataset.m;render()});
+  const r=$('#role');if(r)r.onchange=()=>{$('#stu').classList.toggle('hidden',r.value!=='student');$('#adm').classList.toggle('hidden',r.value==='student')};
+  const ds=$('#dorm');if(ds&&preDorm)ds.value=preDorm;if(ds){const ph=()=>{$('#email').placeholder='name@gmail.com'};ds.onchange=()=>{ph();$('#dorm2').innerHTML=dormOpts2(ds.value)};ph()}
+  $('#auth').onsubmit=onAuth;return;
+ }
+ $('#out').onclick=logout;
+ if($('#bk'))$('#bk').onclick=()=>{me=back;back=null;dflt='all';page='dev';render()};
+ $$('[data-as-u]').forEach(b=>b.onclick=()=>{back=me;me=users.find(u=>u.email===b.dataset.asU);dflt=me.role==='admin'?me.dorm:'all';flt='all';page=HOME[me.role];render()});
+ $$('[data-del-u]').forEach(b=>b.onclick=()=>{if(confirm('Қолданушы өшіріледі. Сенімдісіз бе?')){users=users.filter(u=>u.email!==b.dataset.delU);save();render()}});
+ if($('#dd-s'))$('#dd-s').onclick=()=>demo('student');
+ if($('#dd-a'))$('#dd-a').onclick=()=>demo('admin');
+ if($('#dr'))$('#dr').onclick=()=>{loadT();toast('Өтінімдер бастапқы қалпына келді')};
+ if($('#dc'))$('#dc').onclick=()=>{users=users.filter(u=>u.email===me.email);save();render()};
+ if($('#dx'))$('#dx').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({users:users.map(({h,...u})=>u),tickets},null,1)],{type:'application/json'}));a.download='campus-backup.json';a.click()};
+ if($('#rep'))$('#rep').onsubmit=onReport;
+ if($('#fdm')&&$('#fdm2'))$('#fdm').onchange=()=>{$('#fdm2').innerHTML=dormOpts2($('#fdm').value,myDid($('#fdm').value))};
+ $$('[data-p]').forEach(b=>b.onclick=()=>{if(!can(b.dataset.p))return;page=b.dataset.p;flt='all';q='';render()});
+ $$('[data-qd]').forEach(b=>b.onclick=()=>{$('#fdm').value=b.dataset.qd;$('#rm').value=b.dataset.qr;$('#ql').textContent=DORMS[b.dataset.qd].n;$('#qr').textContent='№'+b.dataset.qr+' бөлме';toast('QR-код сәтті сканерленді!')});
+ $$('[data-demo]').forEach(b=>b.onclick=()=>{const p=$('#pv');p.src=p.dataset.s=PH[b.dataset.demo];p.classList.remove('hidden')});
+ $$('[data-ac]').forEach(b=>b.onclick=()=>{setSt(b.dataset.ac,'received');toast('Өтінім қабылданды')});
+ $$('[data-st]').forEach(x=>x.onchange=()=>{setSt(x.dataset.st,x.value);toast('Статус өзгертілді')});
+ if($('#qs'))$('#qs').onchange=e=>{q=e.target.value.toLowerCase();render()};
+ if(page==='about')charts();
+ $$('[data-as]').forEach(b=>b.onclick=async()=>{const t=tickets.find(x=>x.id===b.dataset.as);if(!t)return;const r=await api('/tickets/update',{id:t.id,st:'in_progress',tech:TECH[t.cat]});if(!r.ok)return toast(r.error||'Қате шықты','err');upd(r.ticket);render();toast('Шебер тағайындалды: '+TECH[t.cat])});
+ $$('[data-rs]').forEach(b=>b.onclick=()=>{rid=b.dataset.rs;$('#rp').value='';$('#dlg').showModal()});
+ if($('#fd'))$('#fd').onchange=e=>{dflt=e.target.value;render()};
+ $$('[data-f]').forEach(b=>b.onclick=()=>{flt=b.dataset.f;render()});
+ if($('#geo-b'))$('#geo-b').onclick=()=>startGeo(true);
+ if(page==='student'||page==='map'){startGeo();geoUI();initPick()}
+ if($('#dn'))$('#dn').onclick=()=>notifyAdmin({dorm:me.dorm,id:'TEST',room:'000',cat:'other',prio:'low',desc:'Бұл Telegram хабарламасының сынағы',who:me.name},true);
+ $$('[data-sc]').forEach(b=>b.onclick=()=>{const k=b.dataset.sc,g=f=>$('#c-'+f+'-'+k).value.trim();const v={uni:k,name:g('name'),phone:g('phone'),email:g('email'),about:$('#c-about-'+k)?$('#c-about-'+k).value.trim():''};b.disabled=true;api('/info/save',v).then(r=>{b.disabled=false;if(!r.ok)return toast(r.error||'Қате шықты','err');contacts[k]={name:v.name,phone:v.phone,email:v.email,about:v.about};render();toast('Сақталды. Барлық құрылғыда көрінеді')})});
+ $$('[data-qdl]').forEach(b=>b.onclick=()=>qrDl(b.dataset.qdl,b.dataset.t));
+ initMap();
+}
+$('#rc').onclick=()=>$('#dlg').close();
+$('#rf').onsubmit=async e=>{e.preventDefault();const t=tickets.find(x=>x.id===rid),f=$('#rp').files[0];if(!t)return;const r=await api('/tickets/update',{id:t.id,st:'resolved',note:$('#rn').value.trim(),after:f?await img(f):''});if(!r.ok)return toast(r.error||'Қате шықты','err');upd(r.ticket);$('#dlg').close();render();toast('Жөнделді! Картада ЖАСЫЛ белгі жанды')};
+
+/* ---------- ЖИ көмекші (кілт сайтта емес, серверде тұрады) ---------- */
+const aiBox=document.createElement('div');aiBox.id='ai';aiBox.className='hidden fixed bottom-20 right-4 lg:bottom-5 lg:right-5 z-[9998]';
+aiBox.innerHTML=`<button id="ai-b" aria-label="ЖИ көмекші" class="ai-glow w-14 h-14 rounded-full shadow-xl shadow-indigo-600/40 hover:scale-105">${aiIcon(56)}</button>
+<div id="ai-p" class="hidden absolute bottom-16 right-0 w-[min(92vw,22rem)] bg-white rounded-3xl border border-slate-200 shadow-2xl overflow-hidden">
+ <div class="px-4 py-3 bg-gradient-to-r from-indigo-600 via-blue-600 to-violet-600 text-white flex items-center gap-3"><span class="shrink-0 rounded-full ring-2 ring-white/30">${aiIcon(38)}</span><div class="min-w-0"><div class="text-sm font-extrabold leading-tight flex items-center gap-1.5">ЖИ көмекші<span class="w-2 h-2 rounded-full bg-emerald-400"></span></div><div class="text-[11px] font-normal text-blue-100">Жатақхана мен өтінімдер туралы сұраңыз</div></div></div>
+ <div id="ai-m" class="h-64 overflow-y-auto p-3 space-y-2 text-sm"></div>
+ <form id="ai-f" class="flex gap-2 p-3 border-t border-slate-100"><input id="ai-i" maxlength="500" placeholder="Сұрағыңызды жазыңыз" class="${F} !mt-0 !py-2"><button aria-label="Жіберу" class="px-3 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 text-white flex items-center justify-center"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3.4 20.4 21 12 3.4 3.6v6.4l12 2-12 2z"/></svg></button></form>
+</div>`;
+document.body.appendChild(aiBox);
+const aiAdd=(t,mine)=>{const d=document.createElement('div');d.className='max-w-[85%] px-3 py-2 rounded-2xl whitespace-pre-wrap '+(mine?'ml-auto bg-blue-600 text-white':'bg-slate-100 text-slate-800');d.textContent=t;$('#ai-m').appendChild(d);$('#ai-m').scrollTop=1e6;return d};
+function aiCtx(){
+ const d=DORMS[me.dorm],c=contacts[me.dorm]||CONTACTS[me.dorm]||{};
+ const my=(me.role==='student'?tickets.filter(t=>t.by===me.email):V()).slice(0,6).map(t=>t.id+': бөлме '+t.room+', '+CATS[t.cat]+', '+ST[t.st][0]).join('; ');
+ return 'Рөл: '+ROLE[me.role]+'. ЖОО: '+d.n+'. Ағымдағы бет: '+PAGES[page]+'. Әкімшілік байланысы: '+(c.name||'көрсетілмеген')+(c.phone?', '+c.phone:'')+(c.email?', '+c.email:'')+'. Өтінімдер'+(me.role==='student'?' (менің)':' (осы ЖОО)')+': '+(my||'жоқ')+'.';
+}
+async function askAI(q,el){
+ if(!AI_URL)return 'ЖИ әлі қосылмаған: файлдың басындағы AI_URL жолына серверіңіздің (Worker) адресін жазыңыз.';
+ const c=new AbortController(),t=setTimeout(()=>c.abort(),45000);
+ try{
+  const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q,context:aiCtx(),lang:localStorage.getItem('cc_lang')||'kk'}),signal:c.signal});
+  if((r.headers.get('content-type')||'').includes('application/json')){const d=await r.json().catch(()=>({}));return d.reply||'⚠️ Сервер бос жауап қайтарды (HTTP '+r.status+').'}
+  if(!r.ok||!r.body)return '⚠️ Сервер күтпеген жауап қайтарды (HTTP '+r.status+').';
+  const rd=r.body.getReader(),dec=new TextDecoder();let out='';
+  for(;;){const {done,value}=await rd.read();if(done)break;out+=dec.decode(value,{stream:true});el.textContent=out;$('#ai-m').scrollTop=1e6}
+  return out.trim()||'Жауап келмеді, қайта жазып көріңіз.';
+ }catch(e){
+  return e.name==='AbortError'?'⚠️ ЖИ 45 секунд жауап бермеді. Қайта жазып көріңіз.':'⚠️ Серверге қосылу қатесі ('+(e.message||e)+').';
+ }finally{clearTimeout(t)}
+}
+$('#ai-b').onclick=()=>{$('#ai-p').classList.toggle('hidden');if(!$('#ai-m').children.length)aiAdd('Сәлем! Жатақхана, өтінім жіберу немесе төтенше жағдай туралы сұраңыз.')};
+$('#ai-f').onsubmit=async e=>{e.preventDefault();const i=$('#ai-i'),q=i.value.trim();if(!q)return;i.value='';aiAdd(q,1);const w=aiAdd('ЖИ ойланып жатыр…');w.textContent=await askAI(q,w)};
+
+(async()=>{
+ if(localStorage.getItem('cc_token')){
+  const r=await api('/auth/me');
+  if(r.ok&&r.user&&DORMS[r.user.uni])me=fromServer(r.user);
+  if(me&&me.role==='student'&&!FULL){location.replace(DASH);return}
+  else if(r.status===401)localStorage.removeItem('cc_token');
+ }
+ if(me&&me.role==='admin')dflt=me.dorm;if(me)page=HOME[me.role];
+ if(UNI&&!me){landing=false;preDorm=UNI;mode='login'}
+ if(me)applyUni();
+ if(me){setTimeout(loadT,400);loadInfo()}
+ save();render();
+})();
+</script>
+</body>
+</html>

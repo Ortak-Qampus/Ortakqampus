@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ortaq Campus — Алматы студенттік жатақханалары</title>
+<meta name="description" content="Жатақханаға орналасу, ақауларға өтінім, ашық мәртебе және ЖИ көмекші бір платформада.">
+<style>
+:root{--bg:#07080B;--card:#11151E;--gold:#E5B869;--silver:#C9CED6;--ease:cubic-bezier(.2,.8,.2,1)}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;background:var(--bg)}
+body{background:var(--bg);color:var(--silver);font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+
+/* Жоғарғы жол */
+.nav{position:fixed;inset:0 0 auto;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:16px 24px;background:linear-gradient(var(--bg),transparent)}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;letter-spacing:.14em;font-size:14px;color:#fff}
+.brand i{width:10px;height:10px;background:var(--gold);transform:rotate(45deg);box-shadow:0 0 14px var(--gold)}
+
+.nav-r{display:flex;align-items:center;gap:12px}
+.lg{display:flex;border:1px solid rgba(201,206,214,.2);border-radius:12px;overflow:hidden}
+.lg button{background:none;border:0;color:#98a0ad;font:600 12px/1 system-ui,sans-serif;padding:9px 10px;cursor:pointer;letter-spacing:.04em}
+.lg button[aria-pressed=true]{background:rgba(229,184,105,.16);color:var(--gold)}
+
+/* Батырмалар: жылтыл + серпіліс */
+.btn{position:relative;display:inline-flex;align-items:center;justify-content:center;padding:16px 30px;border-radius:16px;border:1px solid transparent;font:600 15px/1 system-ui,sans-serif;letter-spacing:.02em;text-decoration:none;cursor:pointer;overflow:hidden;isolation:isolate;transition:transform .4s cubic-bezier(.34,1.56,.64,1),box-shadow .3s,border-color .3s}
+.btn::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.5) 50%,transparent 70%);transform:translateX(-130%)}
+.btn:hover::after{transform:translateX(130%);transition:transform .8s var(--ease)}
+.btn:hover{transform:translateY(-3px)}
+.btn:active{transform:scale(.94)}
+.btn-gold{color:#1a1204;background:linear-gradient(135deg,#f6d99b,var(--gold) 55%,#b88a3c);box-shadow:0 10px 34px -10px rgba(229,184,105,.6)}
+.btn-ghost{color:#e8eaee;background:rgba(255,255,255,.04);border-color:rgba(201,206,214,.28);backdrop-filter:blur(8px)}
+.btn-ghost:hover{border-color:rgba(229,184,105,.6)}
+.sm{padding:10px 18px;font-size:14px;border-radius:12px}
+
+/* Hero */
+.hero{position:relative;min-height:100svh;display:grid;place-items:center;text-align:center;padding:110px 24px 80px;overflow:hidden}
+#fx{position:absolute;inset:-4%;width:108%;height:108%;filter:blur(4px)}
+.hero::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 25%,rgba(7,8,11,.55) 70%,var(--bg) 100%),linear-gradient(transparent 70%,var(--bg))}
+.hero-in{position:relative;z-index:2;max-width:900px}
+h1{font-family:ui-serif,Georgia,"Times New Roman",serif;font-weight:700;font-size:clamp(46px,12vw,156px);line-height:.94;letter-spacing:.07em;background:linear-gradient(180deg,#fff6df 0%,var(--gold) 48%,#8d6b2e 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 8px 40px rgba(229,184,105,.25))}
+.lead{max-width:560px;margin:28px auto 38px;font-size:clamp(16px,2.2vw,19px);color:#b9bfc9}
+.cta{display:flex;flex-wrap:wrap;gap:14px;justify-content:center}
+.up{opacity:0;filter:blur(14px);transform:translateY(26px);animation:rise 1.3s var(--ease) forwards;animation-delay:var(--d,0s)}
+@keyframes rise{to{opacity:1;filter:none;transform:none}}
+
+/* Блоктар */
+.block{padding:110px 0}
+h2{font-family:ui-serif,Georgia,"Times New Roman",serif;font-weight:600;font-size:clamp(30px,5vw,54px);line-height:1.1;color:#f2f3f5;max-width:640px;margin-bottom:14px}
+.sub{max-width:520px;color:#98a0ad;margin-bottom:48px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.card{position:relative;padding:32px 26px;background:var(--card);border:1px solid rgba(229,184,105,.14);border-radius:24px;overflow:hidden}
+.card::before{content:"";position:absolute;inset:0;opacity:0;transition:opacity .4s;background:radial-gradient(340px circle at var(--mx,50%) var(--my,0%),rgba(229,184,105,.17),transparent 62%)}
+.card:hover{border-color:rgba(229,184,105,.42)}
+.card:hover::before{opacity:1}
+.card svg{width:30px;height:30px;stroke:var(--gold);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;margin-bottom:22px}
+.card h3{font-size:19px;color:#fff;margin-bottom:8px;font-weight:600}
+.card p{font-size:15px;color:#9aa2af}
+
+/* Көрсеткіштер */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));background:rgba(17,21,30,.7);border:1px solid rgba(201,206,214,.12);border-radius:30px;padding:20px 0}
+.stat{padding:34px 20px;text-align:center}
+.stat+.stat{border-left:1px solid rgba(201,206,214,.1)}
+.num{font-family:ui-serif,Georgia,serif;font-size:clamp(54px,8vw,92px);line-height:1;font-weight:700;background:linear-gradient(180deg,#fff,var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.num small{font-size:.4em;color:var(--silver);-webkit-text-fill-color:var(--silver)}
+.stat p{margin-top:10px;color:#98a0ad;font-size:15px}
+.end{text-align:center}
+.end h2{margin:0 auto 32px}
+footer{padding:36px 24px 48px;display:flex;flex-wrap:wrap;justify-content:center;gap:6px 24px;text-align:center;font-size:13px;color:#5f6673}
+footer b{color:var(--silver);font-weight:600}
+
+/* Скролл: бұлыңғырдан айқындалып, өз орнына жиналу */
+.rv{opacity:0;filter:blur(14px);transform:translate(var(--x,0),var(--y,60px)) scale(.95);transition:opacity 1.1s var(--ease) var(--d,0s),filter 1.1s var(--ease) var(--d,0s),transform 1.1s var(--ease) var(--d,0s),border-color .4s}
+.rv[data-f=l]{--x:-70px;--y:24px}.rv[data-f=r]{--x:70px;--y:24px}
+.rv.in{opacity:1;filter:none;transform:none}
+
+@media(max-width:640px){.brand{font-size:12px;letter-spacing:.08em}.lg button{padding:8px 7px}.block{padding:80px 0}.stat+.stat{border-left:0;border-top:1px solid rgba(201,206,214,.1)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.up,.rv{opacity:1!important;filter:none!important;transform:none!important}}
+</style>
+</head>
+<body id="top">
+<header class="nav">
+  <a class="brand" href="#top"><i></i>ORTAQ CAMPUS</a>
+  <div class="nav-r">
+    <div class="lg" role="group" aria-label="Тіл"><button data-l="kk">ҚАЗ</button><button data-l="ru">РУС</button><button data-l="en">ENG</button></div>
+    <a class="btn btn-ghost sm" data-app href="app.html">Кіру</a>
+  </div>
+</header>
+
+<section class="hero" id="hero">
+  <canvas id="fx" aria-hidden="true"></canvas>
+  <div class="hero-in">
+    <h1 class="up">ORTAQ<br>CAMPUS</h1>
+    <p class="lead up" style="--d:.25s">Жатақханаға орналасу, ақауларға өтінім, нақты мәртебе және ЖИ көмекші — бір платформада. Әр шешім студентке көрінеді.</p>
+    <div class="cta up" style="--d:.45s">
+      <a class="btn btn-gold" data-app href="app.html">Платформаға кіру</a>
+      <a class="btn btn-ghost" href="#how">Қалай жұмыс істейді?</a>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="how">
+  <div class="wrap">
+    <h2 class="rv">Жүйе қалай жұмыс істейді</h2>
+    <p class="sub rv" style="--d:.1s">Жылдам тіркеу, нақты орын, лезде көмек және ашық шешім: бәрі бір жүйеде.</p>
+    <div class="grid">
+      <article class="card rv" data-f="l">
+        <svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>
+        <h3>Жатақханаға онлайн өтініш</h3><p>Өтінімді сайттан жіберіп, нөмір алыңыз. Шешімді комиссия ашық критерийлер бойынша қабылдайды, әр өзгеріс тарихта көрінеді.</p>
+      </article>
+      <article class="card rv" style="--d:.12s">
+        <svg viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 14h2v6h-6v-2h4z"/></svg>
+        <h3>QR-код</h3><p>Жатақханадағы QR-ды сканерлесеңіз, жүйе университетті өзі таңдайды. Тіркеу бір сәтте.</p>
+      </article>
+      <article class="card rv" data-f="r" style="--d:.24s">
+        <svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+        <h3>20 метрлік геолокация</h3><p>Өтінімді ақау орнынан 20 метр ішінде ғана жіберуге болады. Жалған өтінімнің жолы жабық.</p>
+      </article>
+      <article class="card rv" data-f="l">
+        <svg viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/></svg>
+        <h3>ЖИ көмекші</h3><p>Бірнеше ЖИ жауабын салыстырып, бір нақты жауап береді. Қазақша, орысша және ағылшынша.</p>
+      </article>
+      <article class="card rv" style="--d:.12s">
+        <svg viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+        <h3>Ашықтық және қоғамдық бақылау</h3><p>Бөлу критерийлері мен жеке деректерсіз хаттамалар жарияланады. Мәртебені негіздемесіз өзгертуге болмайды.</p>
+      </article>
+      <article class="card rv" data-f="r" style="--d:.24s">
+        <svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 1 1 12 0v5l2 2H4z"/><path d="M10 21h4"/></svg>
+        <h3>Лезде хабарлама</h3><p>Жаңа өтінім түскенде әкімші Telegram және email арқылы бірден хабар алады.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="block" style="padding-top:20px">
+  <div class="wrap">
+    <div class="stats rv">
+      <div class="stat"><div class="num"><span data-to="24">0</span><small>/7</small></div><p>Қолжетімділік</p></div>
+      <div class="stat"><div class="num"><span data-to="100">0</span><small>%</small></div><p>Ашықтық</p></div>
+      <div class="stat"><div class="num"><span data-to="7">0</span></div><p>Университет бір жүйеде</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="block end">
+  <div class="wrap">
+    <h2 class="rv">Жатақхана әділ әрі ашық болсын</h2>
+    <div class="rv" style="--d:.15s"><a class="btn btn-gold" data-app href="app.html">Платформаға кіру</a></div>
+  </div>
+</section>
+<footer><span>© 2026 Ortaq Campus, Алматы</span><span>Әзірлеуші: <b>Әбіл Сейдаканов</b></span></footer>
+
+<script>
+// Платформа бетінің адресі (қажет болса осы жерде ауыстырыңыз)
+const APP_URL='app.html';
+document.querySelectorAll('[data-app]').forEach(a=>a.href=APP_URL);
+
+// QR сілтемесі (?uni=...) бас бетке түссе, платформаға сол күйі жібереміз
+if(/[?&]uni=/.test(location.search))location.replace(APP_URL+location.search);
+
+// Тіл: платформамен ортақ cc_lang кілті арқылы сақталады
+const L={
+'Кіру':['Войти','Log in'],
+'Платформаға кіру':['Войти на платформу','Open the platform'],
+'Қалай жұмыс істейді?':['Как это работает?','How does it work?'],
+'Жатақханаға орналасу, ақауларға өтінім, нақты мәртебе және ЖИ көмекші — бір платформада. Әр шешім студентке көрінеді.':['Заселение в общежитие, заявки на неисправности, понятный статус и ИИ-помощник на одной платформе. Каждое решение видно студенту.','Dorm placement, repair requests, clear status and an AI assistant on one platform. Every decision is visible to the student.'],
+'Жүйе қалай жұмыс істейді':['Как работает система','How the system works'],
+'Жылдам тіркеу, нақты орын, лезде көмек және ашық шешім: бәрі бір жүйеде.':['Быстрая регистрация, точное место, мгновенная помощь и открытое решение: всё в одной системе.','Quick sign-up, exact location, instant help and an open decision, all in one system.'],
+'QR-код':['QR-код','QR code'],
+'Жатақханадағы QR-ды сканерлесеңіз, жүйе университетті өзі таңдайды. Тіркеу бір сәтте.':['Отсканируйте QR в общежитии, и система сама выберет университет. Регистрация за минуту.','Scan the QR in your dorm and the system picks your university. Sign-up takes a moment.'],
+'20 метрлік геолокация':['Геолокация 20 метров','20-metre geolocation'],
+'Өтінімді ақау орнынан 20 метр ішінде ғана жіберуге болады. Жалған өтінімнің жолы жабық.':['Заявку можно отправить только в пределах 20 метров от места неисправности. Ложным заявкам путь закрыт.','A request can only be sent within 20 metres of the fault, so fake reports are blocked.'],
+'ЖИ көмекші':['ИИ-помощник','AI assistant'],
+'Бірнеше ЖИ жауабын салыстырып, бір нақты жауап береді. Қазақша, орысша және ағылшынша.':['Несколько ИИ сверяют ответы и дают один точный. Отвечает на казахском, русском и английском.','Several AIs cross-check their answers and give one precise reply in Kazakh, Russian or English.'],
+'Жатақханаға онлайн өтініш':['Онлайн-заявка на общежитие','Online dorm application'],
+'Өтінімді сайттан жіберіп, нөмір алыңыз. Шешімді комиссия ашық критерийлер бойынша қабылдайды, әр өзгеріс тарихта көрінеді.':['Подайте заявку на сайте и получите номер. Решение принимает комиссия по открытым критериям, каждое изменение видно в истории.','Apply on the site and get a request number. A committee decides by open criteria and every change shows in the history.'],
+'Ашықтық және қоғамдық бақылау':['Открытость и общественный контроль','Openness and public oversight'],
+'Бөлу критерийлері мен жеке деректерсіз хаттамалар жарияланады. Мәртебені негіздемесіз өзгертуге болмайды.':['Публикуются критерии распределения и протоколы без личных данных. Менять статус без обоснования нельзя.','Allocation criteria and anonymised protocols are published. A status cannot be changed without a reason.'],
+'Лезде хабарлама':['Мгновенные уведомления','Instant alerts'],
+'Жаңа өтінім түскенде әкімші Telegram және email арқылы бірден хабар алады.':['При новой заявке администратор сразу получает сообщение в Telegram и на email.','Admins get a Telegram and email message as soon as a new request arrives.'],
+'Қолжетімділік':['Доступность','Availability'],
+'Ашықтық':['Открытость','Transparency'],
+'Университет бір жүйеде':['Университетов в одной системе','Universities in one system'],
+'Жатақхана әділ әрі ашық болсын':['Пусть общежитие будет честным и открытым','Let the dorm be fair and open'],
+'Әзірлеуші':['Разработчик','Developer'],
+'Әзірлеуші:':['Разработчик:','Developer:'],
+'Әбіл Сейдаканов':['Абиль Сейдаканов','Abil Seidakanov'],
+'© 2026 Ortaq Campus, Алматы':['© 2026 Ortaq Campus, Алматы','© 2026 Ortaq Campus, Almaty']
+};
+function applyLang(l){
+  try{localStorage.setItem('cc_lang',l)}catch{}
+  document.documentElement.lang=l;
+  const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
+  for(let n;n=w.nextNode();){
+    if(n.parentElement.closest('script,style'))continue;
+    const o=n._k||n.nodeValue,k=o.trim(),v=L[k];
+    if(!v)continue;
+    n._k=o;n.nodeValue=l==='kk'?o:o.replace(k,v[l==='ru'?0:1]);
+  }
+  document.querySelectorAll('.lg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.l===l));
+}
+document.querySelectorAll('.lg button').forEach(b=>b.onclick=()=>applyLang(b.dataset.l));
+let cur='kk';try{cur=localStorage.getItem('cc_lang')||'kk'}catch{}
+applyLang(['kk','ru','en'].includes(cur)?cur:'kk');
+
+// Скролл: карточкалар мен блоктар жиналып келеді
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.15,rootMargin:'0px 0px -6% 0px'});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+
+// Санау анимациясы
+const co=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting)return;co.unobserve(e.target);
+  e.target.querySelectorAll('[data-to]').forEach(n=>{
+    const to=+n.dataset.to,t0=performance.now(),d=1900;
+    const step=t=>{const p=Math.min(1,(t-t0)/d);n.textContent=Math.round(to*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(step)};
+    requestAnimationFrame(step);
+  });
+}),{threshold:.4});
+document.querySelectorAll('.stats').forEach(s=>co.observe(s));
+
+// Карточкадағы курсор жарығы
+document.querySelectorAll('.card').forEach(c=>c.addEventListener('pointermove',e=>{
+  const r=c.getBoundingClientRect();c.style.setProperty('--mx',e.clientX-r.left+'px');c.style.setProperty('--my',e.clientY-r.top+'px');
+}));
+
+// Hero: баяу қозғалатын сұйық металл, курсорға жауап береді
+(()=>{
+  const hero=document.getElementById('hero'),cv=document.getElementById('fx'),ctx=cv.getContext('2d');
+  const S=.28,still=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  let W,H,mx=.5,my=.5,tx=.5,ty=.5,act=0,tgt=0,pulse=0,vis=true,run=false;
+  const G=[229,184,105],V=[201,206,214],W2=[255,226,170],D=[150,158,172];
+  const B=[[.30,.40,.20,0,G],[.70,.55,.17,.9,V],[.50,.30,.24,2.1,G],[.25,.76,.18,3.4,D],[.80,.28,.16,4.6,W2],[.55,.80,.19,5.5,G]]
+    .map(([x,y,r,p,c])=>({x,y,r,p,c,ox:0,oy:0,s:.22+r*.4}));
+  function size(){W=cv.width=Math.ceil(innerWidth*S);H=cv.height=Math.ceil(hero.offsetHeight*S);if(still)draw(0)}
+  function orb(x,y,R,c,a){
+    const g=ctx.createRadialGradient(x,y,0,x,y,R);
+    g.addColorStop(0,`rgba(${c},${a})`);g.addColorStop(.5,`rgba(${c},${a*.35})`);g.addColorStop(1,`rgba(${c},0)`);
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,R,0,6.2832);ctx.fill();
+  }
+  function draw(ms){
+    const t=ms/1000,m=Math.min(W,H);
+    mx+=(tx-mx)*.08;my+=(ty-my)*.08;act+=(tgt-act)*.06;pulse*=.94;
+    ctx.globalCompositeOperation='source-over';ctx.fillStyle='#07080B';ctx.fillRect(0,0,W,H);
+    ctx.globalCompositeOperation='lighter';
+    for(const b of B){
+      const px0=(b.x+Math.sin(t*b.s+b.p)*.14)*W+b.ox,py0=(b.y+Math.cos(t*b.s*1.3+b.p)*.12)*H+b.oy;
+      const dx=mx*W-px0,dy=my*H-py0,k=act*Math.max(0,1-Math.hypot(dx,dy)/(m*.9));
+      b.ox+=(dx*k*.45-b.ox)*.05;b.oy+=(dy*k*.45-b.oy)*.05;
+      orb(px0,py0,b.r*m*(1.25+k*.5+pulse*.5),b.c,.42);
+    }
+    orb(mx*W,my*H,m*(.16+pulse*.2),W2,.5*act);
+    // күміс лента сызықтары
+    ctx.globalCompositeOperation='lighter';ctx.lineWidth=1.6;
+    for(let i=0;i<3;i++){
+      ctx.strokeStyle=`rgba(201,206,214,${.16+act*.1})`;ctx.beginPath();
+      for(let x=0;x<=W;x+=6){
+        const near=Math.exp(-Math.pow((x-mx*W)/(W*.18),2))*act;
+        const y=H*(.32+i*.18)+Math.sin(x*.018+t*(.5+i*.18)+i*2)*H*.05+near*(my*H-H*(.32+i*.18))*.35;
+        x?ctx.lineTo(x,y):ctx.moveTo(x,y);
+      }
+      ctx.stroke();
+    }
+  }
+  function loop(ms){if(!vis){run=false;return}draw(ms);requestAnimationFrame(loop)}
+  function start(){if(!run&&!still){run=true;requestAnimationFrame(loop)}}
+  hero.addEventListener('pointermove',e=>{const r=hero.getBoundingClientRect();tx=(e.clientX-r.left)/r.width;ty=(e.clientY-r.top)/r.height;tgt=1});
+  hero.addEventListener('pointerleave',()=>tgt=0);
+  hero.addEventListener('pointerdown',()=>pulse=1);
+  new IntersectionObserver(([e])=>{vis=e.isIntersecting;if(vis)start()}).observe(hero);
+  addEventListener('resize',size);size();start();
+})();
+</script>
+</body>
+</html>

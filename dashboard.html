@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Жеке кабинет — Ortaq Campus</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{--bg:#0A0C10;--card:#11141C;--card2:#171B25;--line:rgba(255,255,255,.07);--tx:#E8EAEE;--mut:#8A93A3;--gold:#E5B869;--silver:#C9CED6;--ok:#7DD3A0;--bad:#E5736A;--info:#9DB4D6}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--tx);font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+button,input,textarea{font-family:inherit;color:inherit}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+.ic{flex:none;display:block}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+/* Орналасу */
+.side{position:fixed;inset:0 auto 0 0;width:244px;padding:18px 14px;border-right:1px solid var(--line);background:var(--bg);display:flex;flex-direction:column;gap:6px;z-index:20}
+.brand{display:flex;align-items:center;gap:10px;padding:6px 10px 18px;font-weight:700;letter-spacing:.06em}
+.brand i{width:9px;height:9px;background:var(--gold);transform:rotate(45deg);box-shadow:0 0 12px rgba(229,184,105,.7)}
+.nav{display:flex;align-items:center;gap:10px;height:40px;padding:0 12px;border:0;border-radius:10px;background:none;color:var(--mut);font-size:14px;font-weight:500;cursor:pointer;text-align:left;transition:background .15s,color .15s}
+.nav:hover{background:rgba(255,255,255,.04);color:var(--tx)}
+.nav.on{background:rgba(229,184,105,.1);color:var(--gold)}
+.nav .s{display:none}
+.sp{flex:1}
+.mini{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.mini b{display:block;font-size:13px;line-height:1.2}.mini small{color:var(--mut);font-size:12px}
+.main{margin-left:244px;min-height:100%}
+.top{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 32px;background:rgba(10,12,16,.86);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.top h1{font-size:22px;font-weight:600}
+.wrap{max-width:1180px;margin:0 auto;padding:24px 32px 48px}
+.view{display:none}.view.on{display:block;animation:in .25s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}}
+.tabs{display:none}
+
+/* Батырмалар */
+.btn{color:var(--tx);display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 14px;border-radius:10px;border:1px solid rgba(255,255,255,.09);background:var(--card2);font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s,transform .08s,filter .15s}
+.btn:hover{background:#1D2230;border-color:rgba(255,255,255,.16)}
+.btn:active{transform:translateY(1px) scale(.98)}
+.btn.pri{background:linear-gradient(#F0C97F,#E5B869);color:#1a1204;border-color:#c99a48;font-weight:600;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 1px 2px rgba(0,0,0,.4)}
+.btn.pri:hover{filter:brightness(1.07)}
+.btn.ghost{background:transparent}
+.btn.lg{height:44px;padding:0 18px}
+.btn.sq{width:40px;padding:0}
+.btn[disabled]{opacity:.4;cursor:not-allowed;transform:none;filter:none}
+
+/* Bento */
+.bento{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.c7{grid-column:span 7}.c5{grid-column:span 5}.c12{grid-column:span 12}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:inset 0 1px 0 rgba(255,255,255,.03)}
+.card h2{font-size:15px;font-weight:600;margin-bottom:4px}
+.mut{color:var(--mut);font-size:13.5px}
+.hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.prof{display:flex;gap:14px;align-items:center}
+.av{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;font-weight:700;color:#1a1204;background:linear-gradient(135deg,#F0C97F,#B88A3C)}
+.prof h2{font-family:ui-serif,Georgia,serif;font-size:22px;font-weight:600;margin:0}
+.room{display:grid;grid-template-columns:1fr auto;gap:14px;margin:18px 0;padding:14px 16px;border-radius:12px;background:var(--card2);border:1px solid var(--line)}
+.room span{font-size:12px;color:var(--mut);display:block}.room b{font-weight:600}.room small{display:block;color:var(--mut);font-size:12.5px}
+.room .big{font-family:ui-serif,Georgia,serif;font-size:34px;line-height:1;color:var(--gold)}
+.row{display:flex;flex-wrap:wrap;gap:10px}
+
+/* Өтінімдер тізімі */
+.tabsf{display:flex;gap:6px;margin-bottom:12px}
+.chip{height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:none;color:var(--mut);font-size:13px;cursor:pointer}
+.chip.on{background:rgba(229,184,105,.1);border-color:rgba(229,184,105,.35);color:var(--gold)}
+.tk{display:flex;gap:12px;align-items:center;padding:12px 4px;border-top:1px solid var(--line)}
+.tk:first-child{border-top:0}
+.tki{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:var(--card2);color:var(--silver)}
+.tkb{flex:1;min-width:0}.tkb b{display:block;font-weight:500;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tkb small{color:var(--mut);font-size:12.5px}
+.bd{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.bd::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.s-open{background:rgba(229,184,105,.12);color:var(--gold)}
+.s-prog{background:rgba(157,180,214,.12);color:var(--info)}
+.s-done{background:rgba(125,211,160,.12);color:var(--ok)}
+.empty{padding:28px 0;text-align:center;color:var(--mut)}
+
+/* Чат */
+.chat{display:flex;flex-direction:column;height:470px;padding:0;overflow:hidden}
+.chat.full{height:calc(100dvh - 150px);min-height:420px}
+.chat .hd{padding:16px 18px;margin:0;border-bottom:1px solid var(--line)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.msgs{flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.m{max-width:86%;padding:9px 13px;border-radius:14px;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere}
+.m.bot{background:var(--card2);border:1px solid var(--line);border-bottom-left-radius:4px}
+.m.me{align-self:flex-end;background:rgba(229,184,105,.14);border:1px solid rgba(229,184,105,.3);border-bottom-right-radius:4px}
+.typing span{display:inline-block;width:6px;height:6px;margin:0 2px;border-radius:50%;background:var(--mut);animation:b 1s infinite}
+.typing span:nth-child(2){animation-delay:.15s}.typing span:nth-child(3){animation-delay:.3s}
+@keyframes b{50%{transform:translateY(-4px);opacity:.5}}
+.sug{display:flex;flex-wrap:wrap;gap:6px;padding:0 18px 10px}
+.cin{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--line)}
+.cin input,.f input,.f textarea{flex:1;min-width:0;height:40px;padding:0 12px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:var(--bg);font-size:14px}
+.cin input:focus,.f input:focus,.f textarea:focus{outline:0;border-color:rgba(229,184,105,.6)}
+
+/* Ережелер, шұғыл */
+details{border-top:1px solid var(--line);padding:14px 2px}details:first-of-type{border-top:0}
+summary{cursor:pointer;font-weight:500;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px}
+summary::-webkit-details-marker{display:none}
+summary .ic{color:var(--mut);transition:transform .2s}details[open] summary .ic{transform:rotate(180deg)}
+details p{margin-top:8px;color:var(--mut)}
+.sos{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.sos a{display:block;padding:18px;border-radius:14px;background:var(--card);border:1px solid var(--line);text-decoration:none;transition:border-color .15s,transform .08s}
+.sos a:hover{border-color:rgba(229,184,105,.4)}.sos a:active{transform:scale(.98)}
+.sos2 b{font-size:26px}
+.sos b{display:block;font-family:ui-serif,Georgia,serif;font-size:34px;color:var(--gold);line-height:1.1}
+.sos span{color:var(--mut);font-size:13.5px}
+
+/* Терезелер */
+.modal{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(5,6,9,.7);backdrop-filter:blur(4px)}
+.modal.on{display:flex}
+.sheet{width:100%;max-width:480px;max-height:92dvh;overflow-y:auto;background:var(--card);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:20px;animation:pop .2s ease}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}}
+.sheet .hd h2{font-size:17px;margin:0}
+.f{display:grid;gap:14px}
+.f label{display:block;font-size:12.5px;color:var(--mut);margin-bottom:6px}
+.f textarea{height:84px;padding:10px 12px;resize:none;width:100%}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border-radius:9px;border:1px solid var(--line);background:var(--card2);color:var(--mut);font-size:13px;cursor:pointer;transition:all .15s}
+.seg button.on{border-color:rgba(229,184,105,.6);color:var(--gold);background:rgba(229,184,105,.1)}
+.gps{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--card2)}
+.gps .pd{width:10px;height:10px;border-radius:50%;background:var(--gold);flex:none}
+.gps.wait .pd{animation:pl 1.2s infinite}.gps.ok .pd{background:var(--ok)}.gps.far .pd,.gps.deny .pd{background:var(--bad)}
+@keyframes pl{50%{opacity:.3}}
+.gps b{display:block;font-size:14px;font-weight:600}.gps small{color:var(--mut);font-size:12.5px}
+.gps>div{flex:1;min-width:0}
+.f input[type=file]{flex:none;width:100%;height:auto;padding:8px 12px;font-size:13px;color:var(--mut)}
+.f input[type=file]::file-selector-button{margin-right:10px;height:28px;padding:0 10px;border-radius:8px;border:1px solid var(--line);background:var(--card2);color:var(--tx);font:inherit;font-size:12.5px;cursor:pointer}
+#pmap{height:210px;border-radius:12px;border:1px solid var(--line);overflow:hidden;background:var(--card2)}
+.leaflet-container{isolation:isolate;font:inherit}
+.pmsg{height:100%;display:grid;place-items:center;padding:16px;text-align:center;color:var(--mut);font-size:13px}
+.qr{margin:6px auto 14px;width:220px;padding:14px;background:#fff;border-radius:14px}.qr svg{display:block;width:100%;height:auto}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:90;display:grid;gap:8px;pointer-events:none}
+#toast div{padding:11px 16px;border-radius:12px;background:#1D2230;border:1px solid rgba(255,255,255,.12);font-size:14px;box-shadow:0 8px 30px rgba(0,0,0,.5);animation:pop .2s ease}
+#toast .err{border-color:rgba(229,115,106,.5)}
+
+/* Телефон */
+@media(max-width:1023px){
+ .side{display:none}.main{margin:0}
+ .top{padding:12px 16px}.top h1{font-size:19px}.wrap{padding:16px 16px 100px}
+ .bento{grid-template-columns:1fr}.c7,.c5,.c12{grid-column:auto}
+ .g2{grid-template-columns:1fr}
+ .tabs{position:fixed;inset:auto 0 0;z-index:30;display:grid;grid-template-columns:repeat(6,1fr);padding:6px 6px calc(6px + env(safe-area-inset-bottom));background:rgba(10,12,16,.94);backdrop-filter:blur(14px);border-top:1px solid var(--line)}
+ .tabs .nav{flex-direction:column;justify-content:center;gap:3px;height:52px;padding:0;font-size:10px;text-align:center}
+ .nav .l{display:none}.nav .s{display:inline}
+ .tabs .nav.on{background:none}
+ .chat.full{height:calc(100dvh - 190px)}
+ #toast{bottom:84px}
+ .modal{align-items:flex-end;padding:0}.sheet{max-width:none;border-radius:20px 20px 0 0;padding-bottom:calc(20px + env(safe-area-inset-bottom))}
+}
+.s-bad{background:rgba(229,115,106,.12);color:var(--bad)}
+.f select{flex:1;min-width:0;height:40px;padding:0 10px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:var(--bg);font-size:14px;width:100%;color:var(--tx)}
+.f select:focus{outline:0;border-color:rgba(229,184,105,.6)}
+.f label.chk{display:flex;gap:10px;align-items:flex-start;margin:0;color:var(--tx);font-size:14px}
+.f .chk input{flex:none;width:18px;height:18px;padding:0;margin-top:3px;accent-color:#E5B869}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ro{height:40px;display:flex;align-items:center;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:var(--card2);font-size:14px;color:var(--mut)}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.steps span{text-align:center;font-size:11.5px;font-weight:600;padding:6px 4px;border-radius:8px;background:var(--card2);color:var(--mut)}
+.steps span.on{background:rgba(229,184,105,.14);color:var(--gold)}.steps span.ok{background:rgba(125,211,160,.1);color:var(--ok)}
+.da{margin-bottom:16px}.da ol{list-style:none;margin-top:10px;padding-left:14px;border-left:2px solid var(--line);display:grid;gap:10px}
+.da li{font-size:13px}.da li small{color:var(--mut);display:block}
+.note{margin-top:12px;padding:10px 12px;border-radius:10px;font-size:13px;background:rgba(229,184,105,.08);border:1px solid rgba(229,184,105,.25)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<aside class="side">
+  <div class="brand"><i></i>ORTAQ CAMPUS</div>
+  <button class="nav on" data-v="dash"><i data-i="home"></i><span class="l">Басты панель</span></button>
+  <button class="nav" data-v="req"><i data-i="plus"></i><span class="l">Өтінім жіберу</span></button>
+  <button class="nav" data-v="dorm"><i data-i="bed"></i><span class="l">Жатақханаға өтініш</span></button>
+  <button class="nav" data-v="rules"><i data-i="book"></i><span class="l">Жатақхана ережелері</span></button>
+  <button class="nav" data-v="sos"><i data-i="alert"></i><span class="l">Шұғыл байланыс</span></button>
+  <button class="nav" data-v="ai"><i data-i="spark"></i><span class="l">AI-көмекші</span></button>
+  <div class="sp"></div>
+  <div class="mini"><div class="av" style="width:34px;height:34px;border-radius:10px;font-size:13px" data-av></div><div><b data-name></b><small data-uni></small></div></div>
+  <a class="btn ghost" href="app.html?full=1" style="text-decoration:none"><i data-i="pin"></i>Толық платформа</a>
+  <button class="btn ghost" data-out><i data-i="out"></i>Шығу</button>
+</aside>
+
+<div class="main">
+  <header class="top">
+    <h1 id="ttl" class="serif">Басты панель</h1>
+    <button class="btn pri" data-new><i data-i="plus"></i>Жаңа өтінім</button>
+  </header>
+  <main class="wrap">
+    <section class="view on" id="v-dash">
+      <div class="bento">
+        <div class="card c7" id="prof"></div>
+        <div class="card c5">
+          <div class="hd"><h2>Жаңа өтінім беру</h2><span class="bd s-open" id="gmini">GPS тексерілмеген</span></div>
+          <p class="mut" style="margin-bottom:16px">Ақау туралы хабарлаңыз. Өтінім жіберу үшін ақау орнынан 20 метр ішінде болуыңыз керек.</p>
+          <button class="btn pri lg" data-new><i data-i="pin"></i>Өтінім жасау</button>
+        </div>
+        <div class="card c7">
+          <div class="hd"><h2>Белсенді өтінімдер</h2><button class="btn ghost" data-v="req">Барлығы</button></div>
+          <div id="l-dash"></div>
+        </div>
+        <div class="c5" id="slot-dash">
+          <div class="card chat" id="chat">
+            <div class="hd"><div style="display:flex;align-items:center;gap:10px"><i data-i="spark"></i><h2 style="margin:0">AI-көмекші</h2></div><span class="dot" title="Желіде"></span></div>
+            <div class="msgs" id="msgs"></div>
+            <div class="sug" id="sug"></div>
+            <div class="cin"><input id="cq" placeholder="Сұрақ жазыңыз…" autocomplete="off"><button class="btn pri sq" id="cs" aria-label="Жіберу"><i data-i="send"></i></button></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="v-req">
+      <div class="card">
+        <div class="hd"><div class="tabsf" id="flt" style="margin:0"><button class="chip on" data-f="all">Барлығы</button><button class="chip" data-f="act">Белсенді</button><button class="chip" data-f="done">Орындалды</button></div><button class="btn pri" data-new><i data-i="plus"></i>Жаңа</button></div>
+        <div id="l-all"></div>
+      </div>
+    </section>
+
+    <section class="view" id="v-dorm">
+      <div class="card" style="max-width:760px;margin-bottom:16px"><h2>Жатақханаға өтініш беру</h2><p class="mut">Өтінім әкімшілікке түседі, шешім ашық ережелермен қабылданады. Әр өзгеріс төменде тарихта көрінеді.</p></div>
+      <div style="max-width:760px" id="dapps"></div>
+      <div class="card f" style="max-width:760px" id="dform"></div>
+    </section>
+
+    <section class="view" id="v-rules">
+      <div class="card" style="max-width:760px;margin-bottom:16px" id="uinfo"></div>
+      <div class="card" style="max-width:760px">
+        <h2 style="margin-bottom:10px">Жатақхана ережелері</h2>
+        <details open><summary>Өтінім қалай жіберіледі<i data-i="down"></i></summary><p>«Жаңа өтінім» батырмасын басып, санат пен маңыздылықты таңдаңыз, ақауды сипаттаңыз. Өтінім әкімшіге бірден түседі, нөмірі беріледі.</p></details>
+        <details><summary>20 метрлік геолокация<i data-i="down"></i></summary><p>Жалған өтінімнің алдын алу үшін өтінімді тек ақау орнынан 20 метр ішінде жіберуге болады. Телефонда геолокацияға рұқсат беріңіз.</p></details>
+        <details><summary>Мәртебелер<i data-i="down"></i></summary><p>Қаралуда: өтінім қабылданды. Жөнделуде: маман жұмыс істеп жатыр. Орындалды: жұмыс аяқталды.</p></details>
+        <details><summary>Жатақханадан шығару шарттары<i data-i="down"></i></summary><p>Негіздер мен рәсім университет комиссиясы бекіткен соң осы жерде жарияланады.</p></details>
+      </div>
+    </section>
+
+    <section class="view" id="v-sos">
+      <div class="sos"><a href="tel:112"><b>112</b><span>Бірыңғай құтқару қызметі</span></a><a href="tel:101"><b>101</b><span>Өрт сөндіру қызметі</span></a><a href="tel:102"><b>102</b><span>Полиция</span></a><a href="tel:103"><b>103</b><span>Жедел жәрдем</span></a><a href="tel:104"><b>104</b><span>Газ апаттық қызметі</span></a></div>
+      <h2 style="margin:26px 0 12px;font-size:15px">Сенім телефондары мен көмек желілері</h2>
+      <div class="sos sos2"><a href="tel:110"><b>110</b><span>ҰҚК сенім телефоны</span></a><a href="tel:1402"><b>1402</b><span>ІІМ бірыңғай сенім телефоны</span></a><a href="tel:115"><b>115</b><span>Бас прокуратура (call-орталық)</span></a><a href="tel:1424"><b>1424</b><span>Сыбайлас жемқорлыққа қарсы қызмет (Антикор)</span></a><a href="tel:111"><b>111</b><span>Отбасы, әйелдер мен балаларға көмек</span></a><a href="tel:150"><b>150</b><span>Психологиялық көмек</span></a></div>
+      <p class="mut" style="margin-top:16px">Өмірге қауіп болса, алдымен қоңырау шалыңыз, содан кейін өтінім беріңіз.</p>
+    </section>
+
+    <section class="view" id="v-ai"><div id="slot-ai"></div></section>
+  </main>
+</div>
+
+<nav class="tabs">
+  <button class="nav on" data-v="dash"><i data-i="home" data-s="22"></i><span class="s">Панель</span></button>
+  <button class="nav" data-v="req"><i data-i="plus" data-s="22"></i><span class="s">Өтінім</span></button>
+  <button class="nav" data-v="dorm"><i data-i="bed" data-s="22"></i><span class="s">Жатақхана</span></button>
+  <button class="nav" data-v="rules"><i data-i="book" data-s="22"></i><span class="s">Ережелер</span></button>
+  <button class="nav" data-v="sos"><i data-i="alert" data-s="22"></i><span class="s">Шұғыл</span></button>
+  <button class="nav" data-v="ai"><i data-i="spark" data-s="22"></i><span class="s">AI</span></button>
+</nav>
+
+<div class="modal" id="m-new" role="dialog" aria-modal="true" aria-label="Жаңа өтінім">
+  <div class="sheet f">
+    <div class="hd" style="margin:0"><h2>Жаңа өтінім</h2><button class="btn ghost sq" data-close aria-label="Жабу"><i data-i="x"></i></button></div>
+    <div><label>Санат</label><div class="seg" id="s-cat"></div></div>
+    <div><label>Маңыздылығы</label><div class="seg" id="s-prio"></div></div>
+    <div><label for="f-dorm">Жатақхана</label><select id="f-dorm"></select></div>
+    <div><label for="f-room">Бөлме</label><input id="f-room" maxlength="20"></div>
+    <div><label for="f-desc">Сипаттама</label><textarea id="f-desc" maxlength="500" placeholder="Не болды? Мысалы: ваннада кран ағып тұр"></textarea></div>
+    <div><label for="f-ph">Фото (міндетті емес)</label><input id="f-ph" type="file" accept="image/*"></div>
+    <div><label>Ақау орны: картадан нүктені басып белгілеңіз</label><div id="pmap"></div></div>
+    <div class="gps wait" id="gps"><span class="pd"></span><div><b id="g-t">GPS іздеуде…</b><small id="g-s">Геолокацияға рұқсат беріңіз</small></div><button class="btn ghost" id="g-demo" type="button" title="Тексеру үшін қашықтықты имитациялау">Демо</button></div>
+    <button class="btn pri lg" id="send" disabled><i data-i="send"></i>Өтінімді жіберу</button>
+  </div>
+</div>
+
+<div class="modal" id="m-qr" role="dialog" aria-modal="true" aria-label="Жеке QR-код">
+  <div class="sheet" style="max-width:360px;text-align:center">
+    <div class="hd"><h2>Жеке QR-код</h2><button class="btn ghost sq" data-close aria-label="Жабу"><i data-i="x"></i></button></div>
+    <div class="qr" id="qrbox"></div>
+    <p class="mut" id="qrcap" style="margin-bottom:14px"></p>
+    <div class="row" style="justify-content:center"><button class="btn" id="qrdl"><i data-i="dl"></i>SVG жүктеу</button></div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const AI_URL='https://ortak-ai.1999versace1999.workers.dev';
+const UNI={
+ "kaznu":{"n":"Әл-Фараби атындағы ҚазҰУ","a":"Әл-Фараби, 71/1","p":[43.2225,76.9228],"dom":"kaznu.kz","ds":[{"id":"kaznu-1","n":"№1 Студенттер үйі","a":"Әл-Фараби, 71/1"},{"id":"kaznu-2","n":"№2 Студенттер үйі","a":"Әл-Фараби, 71/2"},{"id":"kaznu-3","n":"№4 Студенттер үйі","a":"Әл-Фараби, 71/4"},{"id":"kaznu-4","n":"№5 Студенттер үйі","a":"Әл-Фараби, 71/5"},{"id":"kaznu-5","n":"№6 Студенттер үйі","a":"Әл-Фараби, 71/6"},{"id":"kaznu-6","n":"№7 Студенттер үйі","a":"Әл-Фараби, 71/7"},{"id":"kaznu-7","n":"№8 Студенттер үйі","a":"Әл-Фараби, 71/8"},{"id":"kaznu-8","n":"№9 Студенттер үйі","a":"Әл-Фараби, 71/9"},{"id":"kaznu-9","n":"№10 Студенттер үйі","a":"Әл-Фараби, 71/10"},{"id":"kaznu-10","n":"№13 Студенттер үйі","a":"Әл-Фараби, 71/13"},{"id":"kaznu-11","n":"№14 Студенттер үйі","a":"Әл-Фараби, 71/14"},{"id":"kaznu-12","n":"№15 Студенттер үйі","a":"Әл-Фараби, 71/15"},{"id":"kaznu-13","n":"№16 Студенттер үйі","a":"Әл-Фараби, 71/16"},{"id":"kaznu-14","n":"№17 Студенттер үйі","a":"Әл-Фараби, 71/17"},{"id":"kaznu-15","n":"№18 Жас ғалымдар үйі","a":"Әл-Фараби, 71/18"}]},
+ "kaznpu":{"n":"Абай атындағы ҚазҰПУ","a":"Қазыбек би, 30 / Уәлиханов, 64","p":[43.2528,76.9532],"dom":"kaznpu.kz","ds":[{"id":"kaznpu-1","n":"№1 Жатақхана","a":"Қазыбек би, 30 / Уәлиханов, 64"},{"id":"kaznpu-2","n":"№2 Жатақхана","a":"Төле би, 86"},{"id":"kaznpu-3","n":"№3 Жатақхана","a":"Сейфуллин, 533 / Қазыбек би, 117"},{"id":"kaznpu-4","n":"№5 Жатақхана","a":"Жамбыл, 25"},{"id":"kaznpu-5","n":"№8 Жатақхана","a":"Әйтеке би, 31"}]},
+ "satbayev":{"n":"Satbayev University","a":"Сейфуллин, 563","p":[43.2369,76.9315],"dom":"satbayev.university","ds":[{"id":"satbayev-1","n":"№1 Жатақхана","a":"Сейфуллин, 563"},{"id":"satbayev-2","n":"№2 Жатақхана","a":"Байтұрсынов, 126/1"},{"id":"satbayev-3","n":"№3 Жатақхана","a":"Байтұрсынов, 126/2"},{"id":"satbayev-4","n":"№4 Жатақхана","a":"Сәтбаев, 22г"},{"id":"satbayev-5","n":"№5 Жатақхана","a":"Сәтбаев, 22д"},{"id":"satbayev-6","n":"№6 МЖК","a":"Ладыгин, 34"}]},
+ "kaznmu":{"n":"С.Ж. Асфендияров атындағы ҚазҰМУ","a":"Бөгенбай батыр, 151","p":[43.2529,76.9242],"dom":"kaznmu.kz","ds":[{"id":"kaznmu-1","n":"№1 Жатақхана","a":"Бөгенбай батыр, 151"},{"id":"kaznmu-2","n":"№2 Жатақхана","a":"Бөгенбай батыр, 153"},{"id":"kaznmu-3","n":"№3 Жатақхана","a":"Төле би, 92"},{"id":"kaznmu-4","n":"№4 Жатақхана","a":"Шевченко, 126"},{"id":"kaznmu-5","n":"№5 Жатақхана","a":"Шағабутдинов, 132"},{"id":"kaznmu-6","n":"№6 Жатақхана","a":"Масанчи, 38"},{"id":"kaznmu-7","n":"№7 Жатақхана","a":"Бөгенбай батыр, 155"}]},
+ "kaznaru":{"n":"ҚазҰАЗУ","a":"Абай, 24","p":[43.238,76.945],"dom":"","ds":[{"id":"kaznaru-1","n":"№1 Жатақхана","a":"Абай, 24"},{"id":"kaznaru-2","n":"№2 Жатақхана","a":"Абай, 26"},{"id":"kaznaru-3","n":"№3 Жатақхана","a":"Сәтбаев, 12"},{"id":"kaznaru-4","n":"№5 Жатақхана","a":"Сәтбаев, 14"},{"id":"kaznaru-5","n":"№7 Жатақхана","a":"Наурызбай батыр, 125"},{"id":"kaznaru-6","n":"№8 Жатақхана","a":"Сейфуллин, 597"},{"id":"kaznaru-7","n":"№9 Жатақхана","a":"Абай, 28"},{"id":"kaznaru-8","n":"№10 Жатақхана","a":"Абай, 30"}]},
+ "atu":{"n":"АТУ","a":"Төле би, 100","p":[43.238,76.945],"dom":"","ds":[{"id":"atu-1","n":"№1 Жатақхана","a":"Төле би, 100"},{"id":"atu-2","n":"№2 Жатақхана","a":"Фуркат, 348/4"},{"id":"atu-3","n":"№3 Жатақхана","a":"Төле би, 100а"},{"id":"atu-4","n":"№4 Жатақхана","a":"Әйтиев, 96"},{"id":"atu-5","n":"№5 Студенттер үйі","a":"Райымбек, 348/5"}]},
+ "ablaikhan":{"n":"ҚазХҚжӘТУ (Абылай хан)","a":"Төле би, 84","p":[43.238,76.945],"dom":"","ds":[{"id":"ablaikhan-1","n":"№1 Жатақхана","a":"Төле би, 84"},{"id":"ablaikhan-2","n":"№2 Жатақхана","a":"Құрманғазы, 107"},{"id":"ablaikhan-3","n":"№3 Жатақхана","a":"Мұратбаев, 200"}]},
+ "nurmubarak":{"n":"Нұр-Мүбарак","a":"Әл-Фараби, 73/1","p":[43.238,76.945],"dom":"","ds":[{"id":"nurmubarak-1","n":"№1 Студенттер үйі (ерлер)","a":"Әл-Фараби, 73/1"},{"id":"nurmubarak-2","n":"№2 Студенттер үйі (қыздар)","a":"Әл-Фараби, 73/2"}]},
+ "kbtu":{"n":"ҚБТУ (KBTU)","a":"Тұрғыт Өзал, 70","p":[43.2435,76.8985],"dom":"kbtu.kz","ds":[{"id":"kbtu-1","n":"Jastar City","a":"Тұрғыт Өзал, 70"},{"id":"kbtu-2","n":"Магистранттар жатақханасы","a":"Ислам Кәрімов, 70"}]},
+ "narxoz":{"n":"Нархоз","a":"Жандосов, 55/1","p":[43.238,76.945],"dom":"","ds":[{"id":"narxoz-1","n":"№1 Жатақхана","a":"Жандосов, 55/1"},{"id":"narxoz-2","n":"№2 Жатақхана","a":"Жандосов, 55/2"},{"id":"narxoz-3","n":"№3 Жатақхана","a":"10-шағын аудан, 22а"}]},
+ "kimep":{"n":"KIMEP","a":"Абай, 2а","p":[43.238,76.945],"dom":"","ds":[{"id":"kimep-1","n":"KIMEP Dormitory","a":"Абай, 2а"}]},
+ "iitu":{"n":"МУИТ (IITU)","a":"Манас, 34/1 / Жандосов, 60","p":[43.2351,76.9097],"dom":"iitu.edu.kz","ds":[{"id":"iitu-1","n":"Студенттер үйі","a":"Манас, 34/1 / Жандосов, 60"}]},
+ "turan":{"n":"Тұран","a":"Сәтбаев, 16-18","p":[43.238,76.945],"dom":"","ds":[{"id":"turan-1","n":"Студенттер үйі","a":"Сәтбаев, 16-18"}]},
+ "dku":{"n":"DKU (Қазақ-Неміс)","a":"Пушкин, 111","p":[43.238,76.945],"dom":"","ds":[{"id":"dku-1","n":"Жатақхана","a":"Пушкин, 111"}]},
+ "aues":{"n":"АЭжБУ (Energo)","a":"Байтұрсынов, 126","p":[43.238,76.945],"dom":"","ds":[{"id":"aues-1","n":"№1, №2, №3 Жатақханалар","a":"Байтұрсынов, 126"}]},
+ "qyzpu":{"n":"QyzPU (Қыздар пед.)","a":"Әйтеке би, 99 / Гоголь, 114","p":[43.238,76.945],"dom":"","ds":[{"id":"qyzpu-1","n":"№1–№7 Студенттер үйлері","a":"Әйтеке би, 99 / Гоголь, 114"}]},
+ "alt":{"n":"ALT (ҚазККА)","a":"Шевченко, 97 / Масанчи, 88","p":[43.238,76.945],"dom":"","ds":[{"id":"alt-1","n":"Студенттер үйлері","a":"Шевченко, 97 / Масанчи, 88"}]},
+ "etu":{"n":"ЕТУ","a":"Төле би, 109б","p":[43.238,76.945],"dom":"","ds":[{"id":"etu-1","n":"Жатақхана","a":"Төле би, 109б"}]},
+ "almau":{"n":"AlmaU","a":"Розыбакиев, 227","p":[43.238,76.945],"dom":"","ds":[{"id":"almau-1","n":"Студенттер үйі","a":"Розыбакиев, 227"}]},
+ "zhurgenov":{"n":"Т. Жүргенов Өнер академиясы","a":"Панфилов, 127 / Қабанбай батыр, 134","p":[43.238,76.945],"dom":"","ds":[{"id":"zhurgenov-1","n":"Студенттер үйі","a":"Панфилов, 127 / Қабанбай батыр, 134"}]},
+ "kazsta":{"n":"ҚазСТА (Спорт академиясы)","a":"Абай, 83 / Байтұрсынов, 105","p":[43.238,76.945],"dom":"","ds":[{"id":"kazsta-1","n":"Студенттер үйлері","a":"Абай, 83 / Байтұрсынов, 105"}]},
+ "kurmangazy":{"n":"Құрманғазы Консерваториясы","a":"Абылай хан, 90 / Шевченко, 95","p":[43.238,76.945],"dom":"","ds":[{"id":"kurmangazy-1","n":"Студенттер үйі","a":"Абылай хан, 90 / Шевченко, 95"}]},
+ "sdu":{"n":"SDU University","a":"Абылай хан көш., 1/1, Қаскелең","p":[43.2078,76.6698],"dom":"sdu.edu.kz","ds":[{"id":"sdu-1","n":"Жатақхана","a":"Абылай хан көш., 1/1, Қаскелең"}]}};
+const ALM=[43.238,76.945]; // координатасы дәл емес ЖОО-лардың картасы осы нүктеден ашылады
+const dormsOf=k=>(UNI[k]&&UNI[k].ds)||[];
+const myDid=k=>{let v='';try{v=localStorage.getItem('cc_dormid')||''}catch(e){}return dormsOf(k).some(d=>d.id===v)?v:((dormsOf(k)[0]||{}).id||'')};
+const dormName=(k,id)=>{const d=dormsOf(k).find(x=>x.id===id);return d?d.n:''};
+const dormAddr=(k,id)=>{const d=dormsOf(k).find(x=>x.id===id);return d?d.a:''};
+const dormOpts2=(k,sel)=>dormsOf(k).map(d=>`<option value="${d.id}"${d.id===sel?' selected':''}>${d.n} — ${d.a}</option>`).join('');
+const saveDid=id=>{try{if(id)localStorage.setItem('cc_dormid',id)}catch(e){}};
+const DORM={...UNI.kbtu};
+const LIMIT=20;
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const I={home:'M3 11l9-8 9 8M5 10v10h14V10',plus:'M12 5v14M5 12h14',book:'M5 4h14v16H5zM9 8h6M9 12h6',alert:'M12 3l9 16H3zM12 10v4M12 17h.01',spark:'M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z',qr:'M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 14h2v6h-6v-2h4z',pin:'M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11zM12 7.5v5M9.5 10h5',send:'M4 12l16-8-6 16-3-7z',x:'M6 6l12 12M18 6L6 18',out:'M9 4H5v16h4M16 8l4 4-4 4M20 12H9',door:'M6 3h12v18H6zM14 12h.01',drop:'M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z',bolt:'M13 3L5 14h6l-1 7 8-11h-6z',sofa:'M6 11V7a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v4M4 11h16v6H4zM6 17v3M18 17v3',wifi:'M2 9a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16a5 5 0 0 1 6 0M12 19.5h.01',bed:'M3 19V6M3 14h18v5M21 14v-2a3 3 0 0 0-3-3h-7v5M7 11h.01',down:'M6 9l6 6 6-6',dl:'M12 4v11M7 11l5 5 5-5M5 20h14'};
+const ic=(n,s=18)=>`<svg class="ic" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="${I[n]}"/></svg>`;
+const icons=()=>$$('[data-i]:not([data-d])').forEach(e=>{e.innerHTML=ic(e.dataset.i,+e.dataset.s||18);e.dataset.d=1;e.style.display='contents'});
+const CAT={door:['Есік / Құлып','door'],plumbing:['Су / Сантехника','drop'],electric:['Электр','bolt'],furniture:['Жиһаз','sofa'],wifi:['Wi-Fi','wifi']};
+const PRIO={urgent:'Шұғыл',medium:'Орташа',low:'Төмен'};
+const ST={open:['Қаралуда','s-open'],in_progress:['Жөнделуде','s-prog'],resolved:['Орындалды','s-done']};
+
+// Демо деректер. Тіркелген қолданушы болса, нақты деректер серверден жүктеледі
+let live=false,me={name:'Айбек Серікұлы',email:'aibek@kbtu.kz',room:'213',uni:'kbtu'};
+let tickets=[
+ {id:'TCK-4F2A91',cat:'plumbing',prio:'urgent',desc:'Ваннада кран ағып тұр',st:'open',room:'213',d:'бүгін, 09:12'},
+ {id:'TCK-8B13C7',cat:'wifi',prio:'medium',desc:'Қабатта Wi-Fi жиі үзіліп жатыр',st:'in_progress',room:'213',d:'кеше, 18:40'},
+ {id:'TCK-1D77E0',cat:'door',prio:'low',desc:'Бөлме есігінің құлпы қатты жүреді',st:'resolved',room:'213',d:'3 күн бұрын'},
+ {id:'TCK-92AA10',cat:'electric',prio:'medium',desc:'Розетка ұшқын шығарады',st:'resolved',room:'213',d:'1 апта бұрын'}];
+let filter='all',cat='door',prio='medium';
+
+// Навигация
+const TT={dash:'Басты панель',req:'Өтінімдер',dorm:'Жатақханаға өтініш',rules:'Жатақхана ережелері',sos:'Шұғыл байланыс',ai:'AI-көмекші'};
+function go(v){
+  if(!TT[v])v='dash';
+  $$('.view').forEach(e=>e.classList.toggle('on',e.id==='v-'+v));
+  $$('.nav').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  $('#ttl').textContent=TT[v];
+  const ai=v==='ai';$('#chat').classList.toggle('full',ai);
+  (ai?$('#slot-ai'):$('#slot-dash')).appendChild($('#chat'));
+  if(v==='dorm')loadD();
+  history.replaceState(null,'','#'+v);scrollTo(0,0);
+}
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-v],[data-new],[data-qr],[data-close],[data-out],.modal');
+  if(!t)return;
+  if(t.dataset.v)go(t.dataset.v);
+  else if('new' in t.dataset)openNew();
+  else if('qr' in t.dataset)openQR();
+  else if('close' in t.dataset)closeAll();
+  else if('out' in t.dataset)logout();
+  else if(t.classList.contains('modal')&&e.target===t)closeAll();
+});
+addEventListener('keydown',e=>{if(e.key==='Escape')closeAll()});
+
+// Профиль, тізім
+const initials=n=>n.split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase();
+function renderProfile(){
+  const first=me.name.split(/\s+/)[0];
+  $('#prof').innerHTML=`<div class="prof"><div class="av">${esc(initials(me.name))}</div><div><h2>Сәлем, ${esc(first)}</h2><p class="mut">${esc(me.email)}</p></div></div>
+  <div class="room"><div><span>Жатақхана</span><b>${esc(DORM.n)}</b><small>${esc(dormName(me.uni,myDid(me.uni)))}${dormAddr(me.uni,myDid(me.uni))?', '+esc(dormAddr(me.uni,myDid(me.uni))):''}</small></div><div><span>Бөлме</span><b class="big">${esc(me.room)}</b></div></div>
+  <div class="row"><button class="btn" data-qr>${ic('qr')}Жеке QR-код</button><button class="btn ghost" data-v="rules">${ic('book')}Ережелер</button><a class="btn ghost" href="app.html?full=1" style="text-decoration:none">${ic('pin')}Толық платформа</a><button class="btn ghost" data-out>${ic('out')}Шығу</button></div>`;
+  $$('[data-av]').forEach(e=>e.textContent=initials(me.name));
+  $$('[data-name]').forEach(e=>e.textContent=me.name);$$('[data-uni]').forEach(e=>e.textContent=DORM.n.split(' —')[0]+' · '+me.room);
+}
+function listHTML(a){
+  if(!a.length)return '<div class="empty">Өтінімдер жоқ</div>';
+  return a.map(t=>{const c=CAT[t.cat]||['Басқа','door'],s=ST[t.st]||ST.open;
+    return `<div class="tk"><div class="tki">${ic(c[1])}</div><div class="tkb"><b>${esc(t.desc)}</b><small>${esc(t.id)} · ${c[0]} · ${PRIO[t.prio]||''} · ${esc(t.d)}</small></div><span class="bd ${s[1]}">${s[0]}</span></div>`}).join('');
+}
+function renderLists(){
+  $('#l-dash').innerHTML=listHTML(tickets.filter(t=>t.st!=='resolved').slice(0,4));
+  $('#l-all').innerHTML=listHTML(tickets.filter(t=>filter==='all'||(filter==='done'?t.st==='resolved':t.st!=='resolved')));
+}
+$('#flt').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;filter=b.dataset.f;$$('#flt .chip').forEach(c=>c.classList.toggle('on',c===b));renderLists()};
+
+// Геолокация: пайдаланушы мен ақау нүктесінің арасы ≤ 20 м (app.html-дегі ереже)
+let geo={st:'wait',d:null,acc:null,lat:null,lng:null,sim:null,w:null,pick:null};
+let pmap=null,pMk=null,uMk=null,pCirc=null,photo='';
+const dist=(a,b,c,d)=>{const r=Math.PI/180,x=Math.sin((c-a)*r/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin((d-b)*r/2)**2;return 12742000*Math.asin(Math.sqrt(x))};
+function recalc(){
+  if(geo.sim!==null){geo.d=geo.sim;geo.st=geo.d<=LIMIT?'ok':'far';return}
+  if(geo.st==='deny'||geo.lat===null)return;
+  const p=geo.pick||{lat:geo.lat,lng:geo.lng};
+  geo.d=dist(geo.lat,geo.lng,p.lat,p.lng);geo.st=geo.d<=LIMIT?'ok':'far';
+}
+function paintGps(){
+  recalc();
+  const g=geo,el=$('#gps');
+  const T={wait:['GPS іздеуде…','Геолокацияға рұқсат беріңіз'],ok:['Орын расталды',`Ақау нүктесі сізден ${Math.round(g.d)} м, шек: ${LIMIT} м`],far:['Нүкте тым алыс',`${Math.round(g.d)} м. Нүкте ${LIMIT} м ішінде болуы керек`],deny:['GPS рұқсаты жоқ','Браузер баптауында геолокацияға рұқсат беріңіз']}[g.st];
+  el.className='gps '+g.st;$('#g-t').textContent=T[0];$('#g-s').textContent=T[1]+(g.acc&&g.sim===null&&g.st!=='deny'?` (±${Math.round(g.acc)} м)`:'');
+  const m=$('#gmini');m.className='bd '+({ok:'s-done',far:'s-open',deny:'s-open',wait:'s-open'}[g.st]);m.textContent={ok:'Орын расталды',far:'Тым алыс',deny:'GPS жоқ',wait:'GPS тексерілуде'}[g.st];
+  syncPick();validate();
+}
+function startGps(){
+  if(geo.w!==null)return;
+  if(!navigator.geolocation){geo.st='deny';paintGps();return}
+  geo.w=navigator.geolocation.watchPosition(p=>{
+    Object.assign(geo,{lat:p.coords.latitude,lng:p.coords.longitude,acc:p.coords.accuracy});
+    if(!geo.pick)geo.pick={lat:geo.lat,lng:geo.lng};
+    geo.st='ok';paintGps();
+  },e=>{if(e.code===1){geo.st='deny';geo.w!==null&&navigator.geolocation.clearWatch(geo.w);geo.w=null;paintGps()}},{enableHighAccuracy:true,maximumAge:3000,timeout:20000});
+}
+$('#g-demo').onclick=()=>{
+  const seq=[13,33,null];geo.sim=seq[(seq.indexOf(geo.sim)+1)%3];
+  if(geo.sim===null){geo.st=geo.lat===null?'wait':'ok';if(geo.lat===null)geo.d=null}
+  paintGps();
+};
+// Ақау нүктесін таңдайтын карта (Leaflet)
+function syncPick(){
+  if(!pmap||typeof L==='undefined')return;
+  const ll=p=>[p.lat,p.lng],ok=geo.st==='ok',col=ok?'#7DD3A0':'#E5736A';
+  if(geo.pick){if(pMk)pMk.setLatLng(ll(geo.pick)).setStyle({color:col,fillColor:col});else pMk=L.circleMarker(ll(geo.pick),{radius:9,color:col,fillColor:col,fillOpacity:.9,weight:3}).addTo(pmap)}
+  if(geo.lat!==null){
+    const u={lat:geo.lat,lng:geo.lng};
+    if(uMk)uMk.setLatLng(ll(u));else uMk=L.circleMarker(ll(u),{radius:6,color:'#fff',weight:2,fillColor:'#2563eb',fillOpacity:1}).bindPopup('Сіз осындасыз').addTo(pmap);
+    if(pCirc)pCirc.setLatLng(ll(u));else pCirc=L.circle(ll(u),{radius:LIMIT,color:'#9DB4D6',weight:2,fillOpacity:.08}).addTo(pmap);
+    if(!pmap._fit){pmap.setView(ll(u),19);pmap._fit=1}
+  }
+}
+function initPick(){
+  const el=$('#pmap');
+  if(typeof L==='undefined'){el.innerHTML='<div class="pmsg">Карта жүктелмеді. Нүкте GPS орныңыз бойынша автоматты алынады.</div>';return}
+  if(!pmap){
+    pmap=L.map(el,{center:geo.lat!==null?[geo.lat,geo.lng]:DORM.p,zoom:geo.lat!==null?19:17,maxZoom:19});
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap',maxZoom:19}).addTo(pmap);
+    if(geo.lat!==null)pmap._fit=1;
+    pmap.on('click',e=>{
+      if(geo.lat===null&&geo.sim===null)return toast('Алдымен геолокацияға рұқсат беріңіз',1);
+      geo.pick={lat:e.latlng.lat,lng:e.latlng.lng};paintGps();
+      if(geo.d>LIMIT)toast(`Нүкте сізден ${Math.round(geo.d)} м алыс. Рұқсат етілген радиус: ${LIMIT} м`,1);
+    });
+  }
+  if(geo.lat!==null)geo.pick={lat:geo.lat,lng:geo.lng};
+  setTimeout(()=>{pmap.invalidateSize();syncPick()},250);
+}
+// Фото: 640 px JPEG-ке кішірейтеді (app.html-дегідей)
+const img=f=>new Promise(r=>{const fr=new FileReader();fr.onload=()=>{const i=new Image();i.onload=()=>{const k=Math.min(1,640/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height);r(c.toDataURL('image/jpeg',.7))};i.onerror=()=>r('');i.src=fr.result};fr.onerror=()=>r('');fr.readAsDataURL(f)});
+$('#f-ph').onchange=async e=>{const f=e.target.files[0];photo=f?await img(f):'';if(f&&!photo)toast('Фотоны оқу мүмкін болмады',1)};
+
+// Жаңа өтінім терезесі
+function seg(id,obj,cur,set){
+  $(id).innerHTML=Object.keys(obj).map(k=>`<button type="button" data-k="${k}" class="${k===cur?'on':''}">${Array.isArray(obj[k])?ic(obj[k][1],16)+obj[k][0]:obj[k]}</button>`).join('');
+  $(id).onclick=e=>{const b=e.target.closest('[data-k]');if(!b)return;set(b.dataset.k);$$(id+' button').forEach(x=>x.classList.toggle('on',x===b))};
+}
+function validate(){$('#send').disabled=!(geo.st==='ok'&&$('#f-desc').value.trim().length>=3)}
+$('#f-desc').oninput=validate;
+function openNew(){
+  closeAll();$('#f-dorm').innerHTML=dormOpts2(me.uni,myDid(me.uni));$('#f-room').value=me.room;$('#f-desc').value='';$('#f-ph').value='';photo='';geo.pick=geo.lat!==null?{lat:geo.lat,lng:geo.lng}:null;$('#g-demo').style.display=live?'none':'';
+  seg('#s-cat',CAT,cat,v=>cat=v);seg('#s-prio',PRIO,prio,v=>prio=v);
+  $('#m-new').classList.add('on');startGps();paintGps();initPick();
+}
+function closeAll(){$$('.modal').forEach(m=>m.classList.remove('on'))}
+function toast(t,err){const d=document.createElement('div');d.textContent=t;if(err)d.className='err';$('#toast').appendChild(d);setTimeout(()=>d.remove(),3600)}
+const when=x=>{try{return new Date(String(x).replace(' ','T')+'Z').toLocaleString('kk-KZ',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}catch{return x||''}};
+const fromApi=x=>({id:x.id,cat:x.cat,prio:x.prio,desc:x.desc,st:x.st,room:x.room,d:when(x.created)});
+$('#send').onclick=async()=>{
+  const b=$('#send');b.disabled=true;
+  const pt=geo.pick||(geo.lat!==null?{lat:geo.lat,lng:geo.lng}:null),r6=x=>+x.toFixed(6);
+  const did=$('#f-dorm').value;saveDid(did);renderProfile();
+  const p={dorm:me.uni,dormId:did,room:$('#f-room').value.trim()||me.room,cat,prio,desc:$('#f-desc').value.trim(),before:photo,geo:true,lat:pt?r6(pt.lat):null,lng:pt?r6(pt.lng):null};
+  let t;
+  if(live){const r=await api('/api/submit-issue',{...p,campusName:DORM.n});if(!r.ok){toast(r.error||'Қате шықты',1);return validate()}t=fromApi(r.ticket)}
+  else t={id:'TCK-'+Math.random().toString(16).slice(2,8).toUpperCase(),cat,prio,desc:p.desc,st:'open',room:p.room,d:'қазір'};
+  tickets.unshift(t);renderLists();closeAll();toast('Өтінім '+t.id+' жіберілді');
+};
+// Әкімшіге Telegram/email хабарлама (app.html-дегі notifyAdmin сияқты)
+function notify(t,p){
+  fetch(AI_URL+'/notify',{method:'POST',headers:{'Content-Type':'application/json',...(tok?{Authorization:'Bearer '+tok}:{})},body:JSON.stringify({campus:me.uni,campusName:DORM.n+(p.dormId?' — '+dormName(me.uni,p.dormId):''),id:t.id,room:t.room||p.room,cat:(CAT[t.cat]||[t.cat])[0],prio:PRIO[t.prio]||t.prio,desc:t.desc||p.desc,who:t.who||me.name,loc:p.lat!=null?p.lat+','+p.lng:'',photo:(p.before||'').startsWith('data:image/jpeg')?p.before:''})})
+    .then(r=>r.json()).then(d=>{if(d.sent)toast('Әкімшілікке хабар жіберілді')}).catch(()=>{});
+}
+
+// Жатақханаға өтініш беру (app.html-дегі /dorm/* API-мен бірдей)
+const DST={submitted:['Жіберілді','s-open'],under_review:['Әкімшілік тексеруінде','s-prog'],need_docs:['Қосымша құжат қажет','s-open'],committee:['Комиссия қарауында','s-prog'],accepted:['Қабылданды','s-done'],reserve:['Резервтік кезек','s-prog'],rejected:['Бас тартылды','s-bad'],appeal:['Апелляцияда','s-prog']};
+const DCAT={orphan:'Жетім студент',no_guardian:'Ата-анасының қамқорлығынсыз қалған студент',disability:'Мүгедектігі бар студент',large_family:'Көпбалалы отбасынан шыққан студент',social_aid:'Әлеуметтік көмек алатын отбасы',kandas:'Қандас мәртебесі',other:'Басқа заңды басымдық санаты'};
+let dapps=[],dstep=1,dform={};
+const fdate=x=>{try{return x?new Date(String(x).replace(' ','T')+'Z').toLocaleString('kk-KZ',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):''}catch{return x||''}};
+const dbd=k=>{const d=DST[k]||[k,'s-open'];return `<span class="bd ${d[1]}">${d[0]}</span>`};
+async function loadD(){
+  if(live){const r=await api('/dorm/mine',{});if(r.ok)dapps=r.apps||[];else toast(r.error||'Қате шықты',1)}
+  renderDorm();
+}
+function renderDorm(){
+  $('#dapps').innerHTML=dapps.map(a=>`<div class="card da"><div class="hd" style="margin:0"><div><span class="mut">Өтініш нөмірі</span><h2 style="font-size:18px">${esc(a.id)}</h2><span class="mut">${esc(fdate(a.created))}</span></div>${dbd(a.status)}</div>${a.note?`<div class="note"><b>Әкімшілік түсіндірмесі:</b> ${esc(a.note)}</div>`:''}<h2 style="margin-top:16px;font-size:14px">Мәртебе тарихы</h2><ol>${(a.history||[]).map(h=>`<li><b>${esc((DST[h.to]||[h.to])[0])}</b><small>${esc(fdate(h.at))}</small>${h.reason?`<small>${esc(h.reason)}</small>`:''}</li>`).join('')}</ol></div>`).join('');
+  const has=dapps.some(a=>a.status!=='rejected'),box=$('#dform');
+  box.style.display=has?'none':'';if(has)return;
+  const f=dform,v=k=>esc(f[k]||'');
+  if(f.name===undefined)f.name=me.name==='Қонақ'?'':me.name;if(f.email===undefined)f.email=me.email;
+  const T=['Студент','Тұрғын үй','Жағдай','Растау'];
+  const inp=(id,l,t,x)=>`<div><label for="d_${id}">${l}</label><input id="d_${id}" type="${t||'text'}" ${x||''}></div>`;
+  let b='';
+  if(dstep===1)b=`<div class="g2">${inp('name','Аты-жөні','text',`value="${v('name')}"`)}<div><label>Университет</label><div class="ro">${esc(DORM.n)}</div></div>${inp('faculty','Факультет','text',`value="${v('faculty')}"`)}${inp('major','Мамандығы','text',`value="${v('major')}"`)}<div><label for="d_course">Курс</label><select id="d_course">${[1,2,3,4,5,6].map(n=>`<option ${String(f.course||1)===String(n)?'selected':''}>${n}</option>`).join('')}</select></div>${inp('phone','Телефон','tel',`placeholder="+7 7xx xxx xxxx" value="${v('phone')}"`)}${inp('email','Email','email',`value="${v('email')}"`)}</div>`;
+  if(dstep===2)b=`<div class="g2">${inp('addr','Тұрақты мекенжай','text',`value="${v('addr')}"`)}${inp('region','Қай өңірден келгені','text',`value="${v('region')}"`)}<div><label for="d_housing">Алматыда тұрғын үйіңіз бар ма?</label><select id="d_housing"><option value="0" ${f.housing!=='1'?'selected':''}>Жоқ</option><option value="1" ${f.housing==='1'?'selected':''}>Бар</option></select></div></div><div><label for="d_reason">Жатақханаға мұқтаждық себебі (кемінде 10 таңба)</label><textarea id="d_reason" style="height:110px">${v('reason')}</textarea></div>`;
+  if(dstep===3)b=`<div id="d_cats" style="display:grid;gap:10px"><label style="margin:0">Әлеуметтік санаттар (бар болса белгілеңіз)</label>${Object.keys(DCAT).map(k=>`<label class="chk"><input type="checkbox" data-cat="${k}" ${(f.cats||[]).includes(k)?'checked':''}>${DCAT[k]}</label>`).join('')}<p class="mut" style="font-size:12.5px">Санаттар кейін құжатпен расталады.</p></div>`;
+  if(dstep===4)b=`<div style="display:grid;gap:12px"><label class="chk"><input type="checkbox" id="d_c1" ${f.c1?'checked':''}>Мен дербес деректерімді өңдеуге келісім беремін</label><label class="chk"><input type="checkbox" id="d_c2" ${f.c2?'checked':''}>Мәліметтердің дұрыстығын растаймын</label></div>`;
+  box.innerHTML=`<div class="hd" style="margin:0"><h2>Жаңа өтініш</h2></div><div class="steps">${T.map((t,i)=>`<span class="${dstep===i+1?'on':dstep>i+1?'ok':''}">${i+1}. ${t}</span>`).join('')}</div>${b}<div class="row" style="justify-content:space-between">${dstep>1?'<button class="btn" id="d_back" type="button">← Артқа</button>':'<span></span>'}${dstep<4?'<button class="btn pri" id="d_next" type="button">Әрі қарай →</button>':'<button class="btn pri" id="d_submit" type="button"><i data-i="send"></i>Өтінімді жіберу</button>'}</div>`;
+  icons();
+  const nx=$('#d_next'),bk=$('#d_back'),sb=$('#d_submit');
+  if(nx)nx.onclick=()=>{dCollect();const g=dform,bad=dstep===1?(!g.name||!g.faculty||!g.major||!g.phone||!g.email):dstep===2?(!g.addr||!g.region||(g.reason||'').length<10):false;if(bad)return toast('Барлық жолдарды толтырыңыз (себеп кемінде 10 таңба)',1);dstep++;renderDorm()};
+  if(bk)bk.onclick=()=>{dCollect();dstep--;renderDorm()};
+  if(sb)sb.onclick=submitDorm;
+}
+function dCollect(){
+  ['name','faculty','major','course','phone','email','addr','region','housing','reason'].forEach(k=>{const e=$('#d_'+k);if(e)dform[k]=e.value.trim()});
+  if($('#d_cats'))dform.cats=$$('[data-cat]').filter(c=>c.checked).map(c=>c.dataset.cat);
+  if($('#d_c1')){dform.c1=$('#d_c1').checked;dform.c2=$('#d_c2').checked}
+}
+async function submitDorm(){
+  dCollect();const f=dform,b=$('#d_submit');
+  if(!f.c1||!f.c2)return toast('Келісім мен растауды белгілеңіз',1);
+  b.disabled=true;let app;
+  if(live){
+    const r=await api('/dorm/apply',{name:f.name,faculty:f.faculty,major:f.major,course:f.course||'1',phone:f.phone,email:f.email,address:f.addr,region:f.region,housing:f.housing==='1',reason:f.reason,categories:f.cats||[],consent:true,confirm:true});
+    if(!r.ok){b.disabled=false;return toast(r.error||'Қате шықты',1)}app=r.app;
+  }else app={id:'DRM-'+Math.random().toString(16).slice(2,8).toUpperCase(),status:'submitted',created:new Date().toISOString().slice(0,19).replace('T',' '),history:[{to:'submitted',at:new Date().toISOString().slice(0,19).replace('T',' ')}]};
+  dapps.unshift(app);dform={};dstep=1;renderDorm();toast('Өтініш жіберілді: '+app.id);
+}
+
+// QR
+function openQR(){
+  const url=new URL('app.html',location.href).href+'?uni='+me.uni+'&room='+encodeURIComponent(me.room);
+  let svg='';
+  try{const q=qrcode(0,'M');q.addData(url);q.make();svg=q.createSvgTag(5,0)}catch{}
+  $('#qrbox').innerHTML=svg||'<p style="color:#333;font-size:13px">QR жасау үшін интернет қажет</p>';
+  $('#qrcap').textContent=`Бөлме ${me.room} · ${DORM.n.split(' —')[0]}`;$('#qrdl').disabled=!svg;
+  $('#qrdl').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml'}));a.download='ortaq-qr-'+me.room+'.svg';a.click()};
+  $('#m-qr').classList.add('on');
+}
+
+// Сервер (тіркелген болса)
+let tok=null;try{tok=localStorage.getItem('cc_token')}catch{}
+async function api(p,body){try{const r=await fetch(AI_URL+p,{method:'POST',headers:{'Content-Type':'application/json',...(tok?{Authorization:'Bearer '+tok}:{})},body:JSON.stringify(body||{})});const j=await r.json();j.status=r.status;return j}catch{return{ok:false,status:0}}}
+// Кіру: токен жоқ немесе жарамсыз болса, app.html-дегі кіру бетіне; әкімші мен әзірлеуші өз панеліне
+const DEMO=/[?&]demo\b/.test(location.search)||location.protocol==='file:';
+const toLogin=()=>location.replace('app.html');
+function logout(){api('/auth/logout').finally(()=>{try{localStorage.removeItem('cc_token')}catch{}toLogin()})}
+async function boot(){
+  if(!tok){if(!DEMO)toLogin();return}
+  const r=await api('/auth/me');
+  if(r.status===401){try{localStorage.removeItem('cc_token')}catch{}return toLogin()}
+  if(!r.ok||!r.user){me={name:'Қонақ',email:'',room:'—',uni:me.uni};tickets=[];renderProfile();renderLists();return toast('Серверге қосылу мүмкін болмады. Интернетті тексеріңіз',1)}
+  if(r.user.role!=='student')return location.replace('app.html?full=1');
+  if(r.user.dormId)saveDid(r.user.dormId);
+  live=true;me={name:r.user.name,email:r.user.email,room:r.user.room||'—',uni:r.user.uni};Object.assign(DORM,UNI[me.uni]||{});
+  const t=await api('/tickets/list');tickets=t.ok?t.tickets.filter(x=>x.by===me.email).map(fromApi):[];
+  renderProfile();renderLists();loadInfo();
+}
+
+// ЖОО туралы ақпарат пен әкімші байланысы (серверден)
+function renderInfo(i){
+  i=i||{};const has=i.name||i.phone||i.email||i.about;
+  $('#uinfo').innerHTML=`<h2 style="margin-bottom:10px">${esc(DORM.n)}: ақпарат пен байланыс</h2>`+(has?`<div style="display:grid;gap:6px;font-size:14px">${i.name?`<div><b>${esc(i.name)}</b><span class="mut"> · әкімшілік</span></div>`:''}${i.phone?`<a href="tel:${esc(i.phone)}" style="color:var(--gold);text-decoration:none;font-weight:600">${esc(i.phone)}</a>`:''}${i.email?`<a href="mailto:${esc(i.email)}" style="color:var(--gold);text-decoration:none;font-weight:600">${esc(i.email)}</a>`:''}${i.about?`<p class="mut" style="white-space:pre-wrap;margin-top:6px">${esc(i.about)}</p>`:''}</div>`:'<p class="mut">Әкімшілік әлі ақпарат қосқан жоқ.</p>');
+}
+async function loadInfo(){const r=await api('/info/list',{});renderInfo(r.ok&&r.info?r.info[me.uni]:null)}
+renderInfo(null);
+
+// AI чат
+const FB=[[/өтінім|заявк|request/i,'Өтінім жіберу үшін «Жаңа өтінім» батырмасын басып, санатты таңдап, сипаттама жазыңыз. Жатақхана нүктесінен 20 м ішінде болуыңыз керек.'],[/шұғыл|112|срочн|emergenc/i,'Өмірге қауіп болса: 112, 101, 102, 103, 104 нөміріне дереу қоңырау шалыңыз.'],[/мәртебе|статус|status/i,'Мәртебелер: Қаралуда, Жөнделуде, Орындалды. Өзгерген сайын тізімде жаңарады.']];
+const SUG=['Өтінімді қалай жіберемін?','Шұғыл нөмірлер','Өтінім мәртебелері'];
+function say(t,who){const d=document.createElement('div');d.className='m '+who;d.textContent=t;$('#msgs').appendChild(d);$('#msgs').scrollTop=1e9;return d}
+async function ask(q){
+  q=q.trim();if(!q)return;say(q,'me');$('#cq').value='';$('#sug').innerHTML='';
+  const w=say('','bot typing');w.innerHTML='<span></span><span></span><span></span>';
+  let a='';
+  try{
+    const ctx=`Университет: ${DORM.n}. Бөлме: ${me.room}. Белсенді өтінімдер: ${tickets.filter(t=>t.st!=='resolved').length}`;
+    const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q,context:ctx,lang:'kk'})});
+    a=(r.headers.get('content-type')||'').includes('json')?(await r.json()).reply:await r.text();
+  }catch{}
+  if(!a)a=(FB.find(f=>f[0].test(q))||[0,'Қазір серверге қосыла алмадым. Кейінірек қайталаңыз.'])[1];
+  w.className='m bot';w.textContent=a;$('#msgs').scrollTop=1e9;
+}
+$('#cs').onclick=()=>ask($('#cq').value);
+$('#cq').onkeydown=e=>{if(e.key==='Enter')ask(e.target.value)};
+$('#sug').innerHTML=SUG.map(s=>`<button class="chip" type="button">${s}</button>`).join('');
+$('#sug').onclick=e=>{if(e.target.matches('.chip'))ask(e.target.textContent)};
+say('Сәлем! Өтінім, ереже немесе шұғыл нөмірлер туралы сұраңыз.','bot');
+
+icons();renderProfile();renderLists();go(location.hash.slice(1));boot();
+</script>
+</body>
+</html>
